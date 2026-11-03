@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Báo giá máy nghiền đá, dây chuyền nghiền sàng | Thanh Long</title>
   <meta name="description" content="Nhận báo giá máy nghiền đá, máy làm cát VSI, máy rửa cát, dây chuyền 50–2.000 tấn/giờ theo đúng loại đá và công suất. Hotline 0912 712 772.">
-  <link rel="canonical" href="https://thegioimaynghienda.com/bao-gia/">
+  <link rel="canonical" href="">
   <meta property="og:locale" content="vi_VN">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Thế Giới Máy Nghiền Đá">
@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css?v=20261019c">
+  <link rel="stylesheet" href="../assets/css/style.css?v=20261103b">
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -143,11 +143,6 @@
             <li><a data-nav="lien-he" href="../lien-he/">Liên hệ</a></li>
           </ul>
         </nav>
-        <button class="search-btn" id="searchBtn" aria-label="Tìm kiếm" aria-expanded="false" aria-controls="searchBox"><svg class="ico"><use href="#i-search"/></svg></button>
-        <form class="search-box" id="searchBox" role="search" action="https://thegioimaynghienda.com/" hidden>
-          <input type="search" name="s" placeholder="Tìm máy, bài viết..." aria-label="Từ khóa tìm kiếm">
-          <button type="submit" aria-label="Tìm"><svg class="ico"><use href="#i-search"/></svg></button>
-        </form>
       </div>
     </div>
   </header>
@@ -156,10 +151,6 @@
     <div class="offcanvas__bg" data-close></div>
     <div class="offcanvas__panel" role="dialog" aria-modal="true" aria-label="Menu">
       <button class="offcanvas__close" data-close aria-label="Đóng menu"><svg class="ico"><use href="#i-close"/></svg></button>
-      <form class="offcanvas__search" role="search" action="https://thegioimaynghienda.com/">
-        <input type="search" name="s" placeholder="Tìm kiếm..." aria-label="Từ khóa tìm kiếm">
-        <button type="submit" aria-label="Tìm"><svg class="ico"><use href="#i-search"/></svg></button>
-      </form>
       <ul class="mnav">
         <li><a data-nav="home" href="../">Trang chủ</a></li>
         <li><a data-nav="gioithieu" href="../gioithieu/">Giới thiệu</a></li>
@@ -203,7 +194,8 @@
       <div class="container">
         <p class="intro reveal">Điền thông số mỏ để nhận <b>cấu hình và báo giá</b> máy nghiền đá, máy làm cát hoặc dây chuyền trọn gói. Càng đủ thông tin, báo giá càng sát thực tế.</p>
         <div class="quote-page">
-          <form class="quote__form js-form reveal" id="quoteForm" novalidate>
+          <form class="quote__form reveal" id="quoteForm" action="mailto:hieu@labcare.com.vn" method="post" enctype="text/plain">
+            <input type="hidden" name="subject" value="Yêu cầu báo giá - thegioimaynghienda.com">
             <h2 class="block-title">Báo giá tự động</h2>
             <p class="fieldset-title">1. Thiết bị và vật liệu</p>
             <div class="field-row">
@@ -220,16 +212,13 @@
             </div>
             <p class="fieldset-title">2. Thông tin liên hệ</p>
             <div class="field-row">
-              <div class="field"><label for="q-name">Họ tên khách hàng <span>*</span></label><input id="q-name" name="name" autocomplete="name" data-check="name"><p class="field__err" id="q-name-err">Vui lòng nhập họ tên.</p></div>
-              <div class="field"><label for="q-phone">Điện thoại <span>*</span></label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" data-check="phone"><p class="field__err" id="q-phone-err">Số điện thoại chưa đúng (9–11 số).</p></div>
+              <div class="field"><label for="q-name">Họ tên khách hàng <span>*</span></label><input id="q-name" name="name" autocomplete="name" required><p class="field__err" id="q-name-err">Vui lòng nhập họ tên.</p></div>
+              <div class="field"><label for="q-phone">Điện thoại <span>*</span></label><input id="q-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[0-9+ .\(\)\-]{9,15}"><p class="field__err" id="q-phone-err">Số điện thoại chưa đúng (9–11 số).</p></div>
             </div>
-            <div class="field"><label for="q-email">Email</label><input id="q-email" name="email" type="email" autocomplete="email" data-check="email"><p class="field__err" id="q-email-err">Email chưa đúng định dạng.</p></div>
+            <div class="field"><label for="q-email">Email</label><input id="q-email" name="email" type="email" autocomplete="email"><p class="field__err" id="q-email-err">Email chưa đúng định dạng.</p></div>
             <div class="field"><label for="q-note">Ghi chú</label><textarea id="q-note" name="note" rows="3" placeholder="Vị trí mỏ, thời gian cần máy, trạm hiện có..."></textarea></div>
             <button class="button button--primary button--block" type="submit">Gửi yêu cầu báo giá</button>
-            <div class="form-done" data-done hidden tabindex="-1">
-              <svg class="ico"><use href="#i-check"/></svg>
-              <div><b>Đã nhận yêu cầu của <span data-done-name></span>.</b> Kỹ sư Thanh Long sẽ gọi lại để xác nhận thông số trước khi gửi báo giá.</div>
-            </div>
+            <p class="quote__note">Nhấn gửi để mở ứng dụng email của bạn với nội dung đã điền.</p>
           </form>
           <aside>
             <div class="side-box reveal">
@@ -366,6 +355,6 @@
   </nav>
   <!-- /layout:footer -->
 
-  <script src="../assets/js/main.js?v=20261019c" defer></script>
+  <script src="../assets/js/main.js?v=20261103b" defer></script>
 </body>
 </html>

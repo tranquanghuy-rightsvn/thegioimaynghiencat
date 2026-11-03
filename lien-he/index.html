@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Liên hệ Thanh Long JSC – hotline 0912 712 772</title>
   <meta name="description" content="Liên hệ Thanh Long JSC: hotline, Zalo 0912 712 772, văn phòng 129 Ngô Đức Kế TP.HCM, trung tâm bảo hành trạm nghiền AH 51 Long Hương.">
-  <link rel="canonical" href="https://thegioimaynghienda.com/lien-he/">
+  <link rel="canonical" href="">
   <meta property="og:locale" content="vi_VN">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Thế Giới Máy Nghiền Đá">
@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css?v=20261019c">
+  <link rel="stylesheet" href="../assets/css/style.css?v=20261103b">
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -151,11 +151,6 @@
             <li><a data-nav="lien-he" href="../lien-he/">Liên hệ</a></li>
           </ul>
         </nav>
-        <button class="search-btn" id="searchBtn" aria-label="Tìm kiếm" aria-expanded="false" aria-controls="searchBox"><svg class="ico"><use href="#i-search"/></svg></button>
-        <form class="search-box" id="searchBox" role="search" action="https://thegioimaynghienda.com/" hidden>
-          <input type="search" name="s" placeholder="Tìm máy, bài viết..." aria-label="Từ khóa tìm kiếm">
-          <button type="submit" aria-label="Tìm"><svg class="ico"><use href="#i-search"/></svg></button>
-        </form>
       </div>
     </div>
   </header>
@@ -164,10 +159,6 @@
     <div class="offcanvas__bg" data-close></div>
     <div class="offcanvas__panel" role="dialog" aria-modal="true" aria-label="Menu">
       <button class="offcanvas__close" data-close aria-label="Đóng menu"><svg class="ico"><use href="#i-close"/></svg></button>
-      <form class="offcanvas__search" role="search" action="https://thegioimaynghienda.com/">
-        <input type="search" name="s" placeholder="Tìm kiếm..." aria-label="Từ khóa tìm kiếm">
-        <button type="submit" aria-label="Tìm"><svg class="ico"><use href="#i-search"/></svg></button>
-      </form>
       <ul class="mnav">
         <li><a data-nav="home" href="../">Trang chủ</a></li>
         <li><a data-nav="gioithieu" href="../gioithieu/">Giới thiệu</a></li>
@@ -225,19 +216,17 @@
               <li><svg class="ico"><use href="#i-doc"/></svg><span><b>Website</b>thegioimaynghienda.com</span></li>
             </ul>
           </div>
-          <form class="quote__form js-form reveal" id="contactForm" novalidate>
+          <form class="quote__form reveal" id="contactForm" action="mailto:hieu@labcare.com.vn" method="post" enctype="text/plain">
+            <input type="hidden" name="subject" value="Liên hệ - thegioimaynghienda.com">
             <h2 class="block-title">Gửi tin nhắn</h2>
-            <div class="field"><label for="c-name">Họ và tên <span>*</span></label><input id="c-name" name="name" autocomplete="name" data-check="name"><p class="field__err" id="c-name-err">Vui lòng nhập họ tên.</p></div>
+            <div class="field"><label for="c-name">Họ và tên <span>*</span></label><input id="c-name" name="name" autocomplete="name" required><p class="field__err" id="c-name-err">Vui lòng nhập họ tên.</p></div>
             <div class="field-row">
-              <div class="field"><label for="c-phone">Số điện thoại <span>*</span></label><input id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" data-check="phone"><p class="field__err" id="c-phone-err">Số điện thoại chưa đúng (9–11 số).</p></div>
-              <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" data-check="email"><p class="field__err" id="c-email-err">Email chưa đúng định dạng.</p></div>
+              <div class="field"><label for="c-phone">Số điện thoại <span>*</span></label><input id="c-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[0-9+ .\(\)\-]{9,15}"><p class="field__err" id="c-phone-err">Số điện thoại chưa đúng (9–11 số).</p></div>
+              <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email"><p class="field__err" id="c-email-err">Email chưa đúng định dạng.</p></div>
             </div>
             <div class="field"><label for="c-msg">Nội dung</label><textarea id="c-msg" name="message" rows="5" placeholder="Nhu cầu, vị trí mỏ, loại đá, công suất..."></textarea></div>
             <button class="button button--primary button--block" type="submit">Gửi</button>
-            <div class="form-done" data-done hidden tabindex="-1">
-              <svg class="ico"><use href="#i-check"/></svg>
-              <div><b>Cảm ơn <span data-done-name></span>.</b> Kỹ sư Thanh Long sẽ liên hệ lại sớm.</div>
-            </div>
+            <p class="quote__note">Nhấn gửi để mở ứng dụng email của bạn với nội dung đã điền.</p>
           </form>
         </div>
       </div>
@@ -332,6 +321,6 @@
   </nav>
   <!-- /layout:footer -->
 
-  <script src="../assets/js/main.js?v=20261019c" defer></script>
+  <script src="../assets/js/main.js?v=20261103b" defer></script>
 </body>
 </html>
