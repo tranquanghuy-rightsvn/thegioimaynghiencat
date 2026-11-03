@@ -634,7 +634,7 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
     body = f"""    <div class="page-title">
       <div class="container">
         <h1>{esc(h1)}</h1>
-        {crumbs_items}
+        {crumbs(crumbs_items, from_dir)}
       </div>
     </div>
     <section class="section">
