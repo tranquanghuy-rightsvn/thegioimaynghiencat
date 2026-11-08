@@ -5,3 +5,4 @@ node_modules/
 .env*
 tools/cache/
 tools/data/raw.pkl
+tools/data/gsc/

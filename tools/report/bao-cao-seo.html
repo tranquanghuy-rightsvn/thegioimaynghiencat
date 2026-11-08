@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Báo cáo SEO – Website mới thegioimaynghienda.com</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+  :root { --blue: #0059b1; --blue2: #037ce7; --light: #e8f4fd; --ink: #1d2433; --muted: #5d6675; --line: #dfe4ea; --green: #15803d; --red: #b91c1c; --amber: #b45309; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 10.5pt/1.55 "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); }
+  h1 { font-size: 22pt; line-height: 1.2; margin: 0 0 6px; color: var(--blue); }
+  h2 { font-size: 14pt; margin: 22px 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--blue); color: var(--blue); break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 14px 0 5px; color: var(--ink); break-after: avoid; }
+  p { margin: 0 0 7px; }
+  ul { margin: 0 0 8px; padding-left: 18px; } li { margin-bottom: 3px; }
+  b { color: #0b1b33; }
+  code { font: 9pt Menlo, Consolas, monospace; background: #f1f4f8; padding: 0 3px; border-radius: 2px; }
+  .muted { color: var(--muted); }
+  .cover { padding: 26px 26px 20px; background: linear-gradient(135deg, #00337a, #0059b1 60%, #037ce7); color: #fff; border-radius: 6px; margin-bottom: 16px; }
+  .cover h1 { color: #fff; }
+  .cover .sub { font-size: 11.5pt; opacity: .92; }
+  .cover .meta { margin-top: 14px; font-size: 9.5pt; opacity: .85; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 6px; }
+  .kpi { border: 1px solid var(--line); border-top: 3px solid var(--blue2); border-radius: 4px; padding: 8px 10px; break-inside: avoid; }
+  .kpi b { display: block; font-size: 17pt; line-height: 1.1; color: var(--blue); }
+  .kpi span { font-size: 8.8pt; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.5pt; break-inside: auto; }
+  th, td { border: 1px solid var(--line); padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: var(--light); color: #0b2d5c; font-weight: 700; }
+  tr { break-inside: avoid; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .before { color: var(--red); } .after { color: var(--green); font-weight: 700; }
+  .note { border-left: 4px solid var(--blue2); background: var(--light); padding: 8px 11px; margin: 8px 0 10px; break-inside: avoid; }
+  .warn { border-left-color: var(--amber); background: #fff7ed; }
+  .alert { border-left-color: var(--red); background: #fef2f2; }
+  .tree { font: 9.2pt/1.45 Menlo, Consolas, monospace; background: #f7f9fc; border: 1px solid var(--line); border-radius: 4px; padding: 9px 12px; white-space: pre; break-inside: avoid; }
+  .tag { display: inline-block; padding: 0 6px; border-radius: 3px; font-size: 8.5pt; font-weight: 700; }
+  .t-done { background: #dcfce7; color: var(--green); } .t-next { background: #fef3c7; color: var(--amber); }
+  .page-break { break-before: page; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  footer { margin-top: 18px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 8.5pt; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Báo cáo công việc SEO<br>Website mới thegioimaynghienda.com</h1>
+  <div class="sub">So sánh với website hiện tại (WordPress) – các hạng mục đã rà soát, sửa lỗi và tối ưu trước khi chuyển sang website mới</div>
+  <div class="meta">Khách hàng: Công ty CP Thiết bị và Dịch vụ Kỹ thuật Thanh Long (Thanh Long JSC) · Ngày lập: 08/11/2026 · Phạm vi: toàn bộ 1.416 URL của website hiện tại</div>
+</div>
+
+<h2>1. Tóm tắt kết quả</h2>
+<p>Website mới được dựng lại từ toàn bộ nội dung của website hiện tại, dưới dạng website tĩnh tốc độ cao triển khai trên Cloudflare. Mục tiêu số một là <b>không làm mất thứ hạng đang có</b>; mục tiêu thứ hai là sửa các lỗi SEO tồn đọng và tạo nền tảng để lên hạng cho các từ khoá bán hàng.</p>
+<div class="kpis">
+  <div class="kpi"><b>1.416</b><span>URL của website cũ được rà soát từng URL</span></div>
+  <div class="kpi"><b>100%</b><span>URL đang có traffic được giữ nguyên hoặc chuyển hướng 301 đúng</span></div>
+  <div class="kpi"><b>352</b><span>chuyển hướng 301 cho URL cũ đã gộp / đổi / xoá</span></div>
+  <div class="kpi"><b>0</b><span>link nội bộ hỏng trên toàn website mới</span></div>
+  <div class="kpi"><b>242</b><span>bài viết được xếp lại vào 16 chuyên mục theo menu mới</span></div>
+  <div class="kpi"><b>820</b><span>liên kết nội bộ theo ngữ cảnh được bổ sung vào nội dung bài</span></div>
+  <div class="kpi"><b>913/913</b><span>ảnh trong bài có thẻ alt và chú thích (trước: 723 có chú thích)</span></div>
+  <div class="kpi"><b>1.111</b><span>trang có đủ meta, canonical, Open Graph và JSON-LD</span></div>
+</div>
+
+<h2>2. Hiện trạng website cũ – các vấn đề phát hiện</h2>
+<p>Dữ liệu dùng để đánh giá: thu thập trực tiếp toàn bộ website, kiểm tra trạng thái thật của từng URL trên máy chủ, và dữ liệu Google Search Console 16 tháng (đến 08/11/2026).</p>
+<table>
+  <tr><th style="width:32%">Vấn đề</th><th>Chi tiết</th><th style="width:13%">Mức độ</th></tr>
+  <tr><td><b>Website từng bị hack, chèn trang rác</b></td><td>Khoảng 856 trang bán hàng tiếng Đức do hacker chèn vào (vd. <code>/Gardena-Comfort-Wand-…</code>), chiếm ~1.054 lượt click trong tháng 7–8/2025. Các trang này hiện đã 404. Đỉnh traffic giữa năm 2025 phần lớn là traffic rác, không phải khách hàng thật.</td><td class="before">Nghiêm trọng</td></tr>
+  <tr><td><b>Traffic tự nhiên thật thấp</b></td><td>Trang thật: 787 click / 16 tháng; 3 tháng gần nhất chỉ 90 click (~30 click/tháng). Từ khoá thương hiệu đứng top 5, nhưng từ khoá bán hàng gần như vắng mặt: "máy nghiền đá" vị trí 53, "máy nghiền cát" 62, "trạm nghiền đá" 58–61, "cát nhân tạo" 76.</td><td class="before">Cao</td></tr>
+  <tr><td><b>Cấu trúc chuyên mục không phản ánh nội dung</b></td><td>216/242 bài (89%) dồn vào một chuyên mục "Tư vấn kỹ thuật"; chuyên mục "Dự án" chứa 8 bài nhưng không bài nào là dự án; menu Sản phẩm trộn lẫn máy lẻ, dây chuyền và phụ tùng.</td><td class="before">Cao</td></tr>
+  <tr><td><b>Canonical rỗng ở trang chính</b></td><td>5 trang quan trọng (Giới thiệu, Sản phẩm, Dịch vụ, Báo giá, Liên hệ) có thẻ canonical rỗng <code>href=""</code>.</td><td class="before">Cao</td></tr>
+  <tr><td><b>Trang trùng lặp nội dung</b></td><td>21 bài trùng (bản "-metso", "-phan-lan"…) và 5 trang <code>/product/…</code> có nội dung y hệt bài viết.</td><td class="before">Trung bình</td></tr>
+  <tr><td><b>Trang demo của theme</b></td><td>19 trang mẫu của theme Flatsome (nội dung "Lorem ipsum", "A Website for Acme Company") vẫn truy cập được.</td><td class="before">Trung bình</td></tr>
+  <tr><td><b>Liên kết đẩy sang website khác</b></td><td>1.383 liên kết trên 181 trang trỏ sang <code>labcare.com.vn</code> (kể cả link bọc số hotline), cùng link rút gọn <code>bom.to</code>, link rác Google Ảnh – làm thất thoát giá trị SEO ra ngoài.</td><td class="before">Trung bình</td></tr>
+  <tr><td><b>Ảnh hỏng trong bài</b></td><td>52 ảnh trên 17 bài lấy trực tiếp từ link tạm của Google Docs – toàn bộ đã chết (404), hiển thị khung trống cả trên website cũ.</td><td class="before">Trung bình</td></tr>
+  <tr><td><b>Thẻ alt, chú thích, meta kém</b></td><td>317 ảnh thiếu alt hoặc alt là tên file; 190 ảnh không có chú thích; 6 bài có description là chữ "excerpt"; 472 tiêu đề dài quá 65 ký tự; ảnh chia sẻ mạng xã hội dùng đường dẫn tương đối nên không hiển thị.</td><td class="before">Trung bình</td></tr>
+  <tr><td><b>Dữ liệu audit sai lệch</b></td><td>27 URL được ghi nhận "200 – còn hoạt động" nhưng thực tế website cũ đang chuyển hướng 301; 3 tag gõ sai chính tả ("Nghiền cá", "Máy lam", "Máy nghiền hàn").</td><td class="before">Thấp</td></tr>
+</table>
+
+<h2 class="page-break">3. Các công việc đã thực hiện</h2>
+
+<h3>3.1. Bảo toàn URL và thứ hạng hiện có <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li>Rà soát từng URL trong 1.416 URL của website cũ, đối chiếu trạng thái thật trên máy chủ (200 / 301 / 404) chứ không chỉ dựa vào báo cáo audit.</li>
+  <li><b>1.061 URL giữ nguyên đường dẫn</b> trên website mới, gồm 242 bài viết, 708 trang tag, trang chủ, Giới thiệu, Báo giá, Liên hệ… Toàn bộ 238 trang Google đã lập chỉ mục đều còn nguyên hoặc chuyển hướng đúng như website cũ.</li>
+  <li><b>352 chuyển hướng 301</b> (cấu hình <code>_redirects</code> của Cloudflare): URL trùng lặp, trang demo, tag sai chính tả, sản phẩm WooCommerce cũ, phân trang cũ… mỗi URL đều trỏ tới trang liên quan nhất, không có chuyển hướng nối chuỗi, không trỏ tới trang lỗi.</li>
+  <li>Giữ đúng 26/26 chuyển hướng 301 mà website cũ đang dùng (21 bài trùng, 5 trang <code>/product/…</code>), đã đối chiếu từng URL với máy chủ thật.</li>
+  <li>Đường dẫn tiếng Việt có dấu được xử lý cả hai cách mã hoá Unicode, tránh lỗi 404 cho các tag có dấu.</li>
+</ul>
+
+<h3>3.2. Dọn nội dung rác, trùng lặp và liên kết ngoài <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li>Gỡ 19 trang demo của theme và 26 trang trùng lặp; tất cả đều 301 về trang phù hợp.</li>
+  <li>Gộp 3 tag sai chính tả vào tag đúng; bài viết được gắn lại tag chuẩn.</li>
+  <li>Xử lý 1.383 liên kết sang <code>labcare.com.vn</code>: trỏ về trang tương ứng trên website (vd. "nhận báo giá" → trang Báo giá), không có trang tương ứng thì giữ chữ, bỏ link. Link bọc số điện thoại đổi thành <code>tel:0912712772</code>.</li>
+  <li>Chỉ giữ liên kết ngoài tới kênh chính thức của công ty (Zalo, YouTube, Facebook) và bản đồ Google.</li>
+  <li>Trang rác do hack trả về 404 tự nhiên trên website mới; website tĩnh không chạy PHP/WordPress nên không thể bị chèn trang theo cách cũ.</li>
+</ul>
+
+<h3>3.3. Cấu trúc menu và chuyên mục mới <span class="tag t-done">Hoàn thành</span></h3>
+<p>Cấu trúc xây dựng theo hành trình mua hàng của ngành máy nghiền: khách tìm <b>thiết bị cụ thể</b> hoặc tìm <b>dây chuyền để sản xuất ra đá/cát</b>, xem <b>dự án</b> để tin tưởng, sau đó liên hệ. Mỗi trong 242 bài được đọc và xếp vào đúng một chuyên mục.</p>
+<div class="tree">GIỚI THIỆU
+THIẾT BỊ  ▾  /san-pham/
+   Máy nghiền đá (41 bài) · Máy làm cát nhân tạo VSI (26) · Máy rửa cát &amp; thu hồi cát mịn (22)
+   Trạm nghiền di động (8) · Thiết bị tuyển quặng (10) · Sàng rung, cấp liệu &amp; phụ tùng SKF
+GIẢI PHÁP ▾  /giai-phap/
+   Dây chuyền nghiền đá (14) · Dây chuyền cát nhân tạo (20) · Dây chuyền rửa cát (8)
+   Dây chuyền tuyển quặng sắt (10) · Tái chế bê tông, phế thải xây dựng (2)
+DỰ ÁN  /du-an/                          chỉ công trình thật Thanh Long đã bàn giao (7)
+DỊCH VỤ ▾   Lắp đặt &amp; chuyển giao · Bảo trì, sửa chữa (4) · Máy cũ &amp; thanh lý (4)
+KIẾN THỨC ▾ Kỹ thuật &amp; vận hành (12) · Cát nhân tạo &amp; VLXD (19) · Thị trường &amp; giá (35)
+LIÊN HỆ                                                    [ BÁO GIÁ ]</div>
+<ul>
+  <li><b>17 trang chuyên mục mới</b> với URL rõ nghĩa theo menu (vd. <code>/san-pham/may-nghien-da/</code>, <code>/giai-phap/day-chuyen-cat-nhan-tao/</code>), mỗi trang có đoạn giới thiệu, danh sách thiết bị, bài viết và cột danh mục bên phải.</li>
+  <li>4 chuyên mục WordPress cũ (<code>/category/…</code>) không có traffic trong 16 tháng được chuyển 301 sang URL mới cùng 27 trang phân trang của chúng.</li>
+  <li>Các trang chuyên mục nhắm trực tiếp vào từ khoá bán hàng đang đứng hạng thấp ("máy nghiền đá", "máy làm cát", "dây chuyền nghiền đá"…).</li>
+</ul>
+
+<h3>3.4. Thẻ meta, canonical và chia sẻ mạng xã hội <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li>Sửa canonical rỗng ở 5 trang chính; mọi trang có đúng một canonical tuyệt đối, trang trùng lặp trỏ về bản gốc.</li>
+  <li>Tiêu đề: chỉ gắn hậu tố " | Thế Giới Máy Nghiền Đá" khi tổng độ dài ≤ 65 ký tự – số tiêu đề bị Google cắt giảm từ <span class="before">472</span> xuống <span class="after">44</span> (44 bài có tên gốc đã dài).</li>
+  <li>Mô tả (description): giới hạn ~155 ký tự, cắt đúng ranh giới chữ; sửa 6 bài có mô tả "excerpt"; không còn mô tả trùng lặp.</li>
+  <li>Bổ sung Open Graph đầy đủ (ảnh với URL tuyệt đối, <code>og:url</code>, <code>og:image:alt</code>), thẻ Twitter Card, thời gian đăng bài cho từng bài viết – link chia sẻ qua Facebook/Zalo hiển thị ảnh và mô tả chuẩn.</li>
+  <li>Thẻ robots: trang cần lập chỉ mục dùng <code>max-image-preview:large</code> (cho phép Google hiện ảnh lớn); trang phân trang và trang trùng dùng <code>noindex, follow</code>.</li>
+  <li>Sitemap XML 976 URL (chỉ các trang nên lập chỉ mục) và <code>robots.txt</code> trỏ tới sitemap.</li>
+</ul>
+
+<h3>3.5. Dữ liệu có cấu trúc (JSON-LD) <span class="tag t-done">Hoàn thành</span></h3>
+<table>
+  <tr><th>Loại trang</th><th>Schema</th></tr>
+  <tr><td>Trang chủ</td><td>WebSite, Organization, LocalBusiness, FAQPage</td></tr>
+  <tr><td>242 bài viết</td><td>Article (tiêu đề, ảnh, ngày đăng, tác giả, nhà xuất bản, chuyên mục) + BreadcrumbList</td></tr>
+  <tr><td>Chuyên mục, Kiến thức, tag</td><td>CollectionPage + BreadcrumbList</td></tr>
+  <tr><td>Giới thiệu · Thiết bị · Dịch vụ · Báo giá · Liên hệ</td><td>AboutPage · CollectionPage · Service · FAQPage · ContactPage, LocalBusiness + BreadcrumbList</td></tr>
+</table>
+<p class="muted">Toàn bộ JSON-LD được kiểm tra cú pháp tự động trên 1.111 trang: không có lỗi.</p>
+
+<h3>3.6. Liên kết nội bộ theo ngữ cảnh <span class="tag t-done">Hoàn thành</span></h3>
+<p>Xác định trang chủ lực theo dữ liệu Search Console và mức độ quan trọng kinh doanh, sau đó chèn liên kết tại lần đầu cụm từ xuất hiện tự nhiên trong đoạn văn (không đặt trong tiêu đề, không tự trỏ về chính bài, mỗi đích tối đa một lần/bài, 1–7 link tuỳ độ dài bài).</p>
+<div class="two">
+<table>
+  <tr><th>Trang nhóm (từ khoá bán hàng)</th><th class="num">Link nhận</th></tr>
+  <tr><td>Máy làm cát nhân tạo VSI</td><td class="num">102</td></tr>
+  <tr><td>Dây chuyền sản xuất cát nhân tạo</td><td class="num">96</td></tr>
+  <tr><td>Dây chuyền nghiền đá</td><td class="num">84</td></tr>
+  <tr><td>Máy rửa cát &amp; thu hồi cát mịn</td><td class="num">58</td></tr>
+  <tr><td>Máy nghiền đá</td><td class="num">45</td></tr>
+</table>
+<table>
+  <tr><th>Bài chủ chốt (theo Search Console)</th><th class="num">Link nhận</th></tr>
+  <tr><td>Cấu tạo, nguyên lý máy nghiền hàm</td><td class="num">103</td></tr>
+  <tr><td>Máy nghiền côn và ưu điểm</td><td class="num">95</td></tr>
+  <tr><td>Cát nhân tạo là gì</td><td class="num">43</td></tr>
+  <tr><td>Khác biệt cát tự nhiên – cát nhân tạo</td><td class="num">38</td></tr>
+  <tr><td>Cát nghiền thay thế cát tự nhiên</td><td class="num">33</td></tr>
+</table>
+</div>
+<p><b>Tổng cộng 820 liên kết</b> được thêm vào 234/242 bài; ngoài ra mỗi bài có khối "Bài viết liên quan" và cột danh mục cùng nhóm.</p>
+
+<h3>3.7. Hình ảnh <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li><b>52 ảnh hỏng</b> (link Google Docs đã hết hạn, hỏng cả trên website cũ): thay <b>49 ảnh</b> bằng ảnh sẵn có của công ty, chọn đúng chủ đề theo mô tả gốc (đúng loại máy: hàm, côn, bi, băng tải, McLanahan…); 3 ảnh không có ảnh thay phù hợp được gỡ bỏ thay vì dùng sai ảnh.</li>
+  <li><b>Alt ảnh:</b> 317 ảnh thiếu alt hoặc alt là tên file → <span class="after">0</span>; alt lấy từ chú thích, tiêu đề mục minh hoạ hoặc tên bài.</li>
+  <li><b>Chú thích ảnh:</b> 723 → <span class="after">913/913</span> ảnh trong bài có chú thích theo chuẩn <code>figure / figcaption</code>.</li>
+  <li>Ảnh nội dung chuyển sang định dạng WebP, tải chậm (lazy-load) để tăng tốc độ trang.</li>
+</ul>
+
+<h3>3.8. Kỹ thuật và trải nghiệm người dùng <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li>Website tĩnh triển khai trên Cloudflare: tải nhanh, không cơ sở dữ liệu, không plugin – loại bỏ rủi ro bị hack như website cũ.</li>
+  <li>Giao diện thống nhất: trang danh sách và bài viết bố cục nội dung 3/4 – danh mục 1/4; 9 bài/trang; nút Báo giá luôn hiển thị trên menu.</li>
+  <li>Kiểm tra hiển thị trên máy tính và điện thoại (không tràn ngang ở 390px), sửa các lỗi giao diện (menu con rớt dòng, nút không thẳng hàng, dấu nháy đè chữ…).</li>
+</ul>
+
+<h2 class="page-break">4. So sánh trước / sau</h2>
+<table>
+  <tr><th style="width:38%">Hạng mục</th><th>Website cũ</th><th>Website mới</th></tr>
+  <tr><td>URL đang có traffic</td><td>—</td><td class="after">Giữ nguyên 100%</td></tr>
+  <tr><td>Chuyển hướng 301 có kiểm soát</td><td class="before">Thiếu, ghi nhận sai trạng thái</td><td class="after">352, đã kiểm tra từng URL</td></tr>
+  <tr><td>Trang demo / trùng lặp truy cập được</td><td class="before">19 demo + 26 trùng</td><td class="after">0</td></tr>
+  <tr><td>Link đẩy sang website khác</td><td class="before">1.383 (labcare.com.vn) + link rút gọn</td><td class="after">0 (chỉ kênh chính thức)</td></tr>
+  <tr><td>Bài nằm trong 1 chuyên mục chung</td><td class="before">216/242 (89%)</td><td class="after">16 chuyên mục theo menu</td></tr>
+  <tr><td>Canonical rỗng ở trang chính</td><td class="before">5 trang</td><td class="after">0</td></tr>
+  <tr><td>Tiêu đề quá 65 ký tự</td><td class="before">472</td><td class="after">44</td></tr>
+  <tr><td>Mô tả lỗi / trùng</td><td class="before">6 "excerpt", 16 quá dài</td><td class="after">0</td></tr>
+  <tr><td>Ảnh chia sẻ MXH hiển thị</td><td class="before">Lỗi ở trang chính (URL tương đối)</td><td class="after">Đủ ở 1.111 trang</td></tr>
+  <tr><td>JSON-LD</td><td>Một số trang</td><td class="after">Tất cả 1.111 trang</td></tr>
+  <tr><td>Liên kết nội bộ theo ngữ cảnh</td><td>Rời rạc, nhiều link ra ngoài</td><td class="after">+820, ưu tiên trang chủ lực</td></tr>
+  <tr><td>Ảnh hỏng trong bài</td><td class="before">52</td><td class="after">0 (49 thay thế, 3 gỡ)</td></tr>
+  <tr><td>Ảnh có alt chuẩn / chú thích</td><td class="before">596 / 723 trên 913</td><td class="after">913 / 913</td></tr>
+  <tr><td>Link nội bộ hỏng</td><td>—</td><td class="after">0</td></tr>
+  <tr><td>Nền tảng</td><td class="before">WordPress, từng bị hack</td><td class="after">Website tĩnh trên Cloudflare</td></tr>
+</table>
+
+<h2>5. Việc cần làm sau khi đưa website mới lên <span class="tag t-next">Đề xuất</span></h2>
+<ol>
+  <li><b>Ngày triển khai:</b> gửi lại sitemap <code>/sitemap.xml</code> trong Google Search Console; kiểm tra ngẫu nhiên các chuyển hướng 301 (đặc biệt URL tiếng Việt có dấu và URL không có dấu "/" cuối).</li>
+  <li><b>2–4 tuần đầu:</b> theo dõi báo cáo Lập chỉ mục và Hiệu suất hằng tuần; xử lý ngay URL lỗi 404 phát sinh (nếu có).</li>
+  <li><b>Nội dung bán hàng:</b> bổ sung mô tả, thông số, hình ảnh thực tế cho các trang Thiết bị và Giải pháp – đây là đòn bẩy chính cho các từ khoá đang ở vị trí 50–60. Nhóm "Sàng rung, cấp liệu &amp; phụ tùng SKF" hiện chưa có bài viết.</li>
+  <li><b>Dự án:</b> mỗi trạm bàn giao mới nên có một bài (địa điểm, công suất, thiết bị, hình ảnh) – tăng độ tin cậy và từ khoá địa phương.</li>
+  <li><b>Sau 3 tháng:</b> đánh giá lại trang tag (708 trang, phần lớn chỉ có 1 bài) dựa trên dữ liệu Search Console mới.</li>
+</ol>
+
+<footer>Báo cáo lập ngày 08/11/2026. Số liệu Search Console: 16 tháng đến 08/11/2026 (loại tìm kiếm Web). Số liệu website mới: bản dựng ngày 08/11/2026.</footer>
+</body>
+</html>

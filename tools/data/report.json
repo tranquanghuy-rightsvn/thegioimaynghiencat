@@ -1,9 +1,23 @@
 {
-  "kept": 1090,
-  "generated_routes": 1094,
+  "kept": 1061,
+  "generated_routes": 1111,
   "missing_kept": [],
-  "redirected_pagination": 23,
-  "extra_generated": [],
+  "redirected_pagination": 0,
+  "extra_generated": [
+    "/nhan-bao-gia/page/26/",
+    "/nhan-bao-gia/page/27/",
+    "/tag/bao-gia-may-nghien-cat/page/6/",
+    "/tag/cat-nhan-tao/page/10/",
+    "/tag/cat-tu-nhien/page/4/",
+    "/tag/dap-ham/page/2/",
+    "/tag/day-chuyen-may-nghien-da/page/6/",
+    "/tag/day-chuyen-san-xuat-cat-nhan-tao/page/4/",
+    "/tag/du-an-cao-toc/page/2/",
+    "/tag/may-nghien-cat/page/9/",
+    "/tag/may-nghien-con/page/7/",
+    "/tag/may-nghien-da-xay-dung/page/4/",
+    "/tag/may-vo-da/page/3/"
+  ],
   "primary_posts": 242,
   "tags": 708
 }
