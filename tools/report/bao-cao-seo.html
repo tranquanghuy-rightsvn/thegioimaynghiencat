@@ -167,7 +167,23 @@ LIÊN HỆ                                                    [ BÁO GIÁ ]</div
   <li>Ảnh nội dung chuyển sang định dạng WebP, tải chậm (lazy-load) để tăng tốc độ trang.</li>
 </ul>
 
-<h3>3.8. Kỹ thuật và trải nghiệm người dùng <span class="tag t-done">Hoàn thành</span></h3>
+<h3>3.8. Đo lường, sitemap và trang lỗi <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li><b>Giữ nguyên toàn bộ mã đo lường của website cũ</b> trên mọi trang: 2 thẻ xác minh Google Search Console, Google Analytics 4 (<code>G-VDFBZC3D97</code>), Google tag (<code>GT-PZSCJG4</code>) và Google Tag Manager (<code>GTM-M3XKBSNK</code>) – chép nguyên văn, đảm bảo không mất quyền Search Console và dữ liệu Analytics không bị gián đoạn khi chuyển website.</li>
+  <li><b>Trang 404 chuẩn:</b> mọi URL không tồn tại (kể cả ~856 URL rác do hack) trả đúng mã 404 kèm gợi ý các mục chính, thay vì trả trang chủ với mã 200 (lỗi "soft 404").</li>
+  <li><b>Ngày cập nhật thật trong sitemap:</b> lấy từ sitemap của website cũ cho từng bài, tag và trang (188/242 bài giữ đúng ngày sửa sau ngày đăng); trang chuyên mục mới lấy ngày bài mới nhất. JSON-LD <code>dateModified</code> và <code>article:modified_time</code> dùng cùng ngày này.</li>
+</ul>
+
+<h3>3.9. Tốc độ tải và kỹ thuật <span class="tag t-done">Hoàn thành</span></h3>
+<ul>
+  <li><b>Kích thước ảnh:</b> 4.130/4.130 ảnh trong nội dung có thuộc tính <code>width</code>/<code>height</code> theo kích thước thật – trang không bị xô lệch khi tải (chỉ số CLS của Core Web Vitals).</li>
+  <li><b>Nén ảnh:</b> 4 ảnh nặng nhất (430–930KB) thu nhỏ và nén WebP, tổng giảm từ 2,38MB xuống ~1,28MB; không còn ảnh nào trên 400KB.</li>
+  <li><b>Font tự lưu trữ:</b> Montserrat và Open Sans (bộ chữ tiếng Việt và Latin) lưu ngay trên website, không còn chờ tải từ Google Fonts trước khi hiển thị trang.</li>
+  <li><b>Bộ nhớ đệm và bảo mật</b> (tệp <code>_headers</code> của Cloudflare): CSS, JS, font lưu đệm 1 năm, ảnh 30 ngày; bổ sung các header bảo mật (HSTS, nosniff, chống nhúng trang, Referrer-Policy).</li>
+  <li><b>Biểu tượng website (favicon):</b> bộ đầy đủ từ logo gốc – favicon.ico, PNG 32/192/512px, biểu tượng cho iPhone và tệp manifest – để Google hiển thị biểu tượng thương hiệu trong kết quả tìm kiếm.</li>
+</ul>
+
+<h3>3.10. Nền tảng và trải nghiệm người dùng <span class="tag t-done">Hoàn thành</span></h3>
 <ul>
   <li>Website tĩnh triển khai trên Cloudflare: tải nhanh, không cơ sở dữ liệu, không plugin – loại bỏ rủi ro bị hack như website cũ.</li>
   <li>Giao diện thống nhất: trang danh sách và bài viết bố cục nội dung 3/4 – danh mục 1/4; 9 bài/trang; nút Báo giá luôn hiển thị trên menu.</li>
@@ -191,6 +207,12 @@ LIÊN HỆ                                                    [ BÁO GIÁ ]</div
   <tr><td>Ảnh hỏng trong bài</td><td class="before">52</td><td class="after">0 (49 thay thế, 3 gỡ)</td></tr>
   <tr><td>Ảnh có alt chuẩn / chú thích</td><td class="before">596 / 723 trên 913</td><td class="after">913 / 913</td></tr>
   <tr><td>Link nội bộ hỏng</td><td>—</td><td class="after">0</td></tr>
+  <tr><td>URL không tồn tại</td><td class="before">Trả lỗi theo WordPress</td><td class="after">Trang 404 chuẩn, mã 404</td></tr>
+  <tr><td>Ngày cập nhật trong sitemap</td><td>Đúng (Yoast)</td><td class="after">Giữ đúng ngày cũ cho từng URL</td></tr>
+  <tr><td>Ảnh có kích thước khai báo (chống xô lệch)</td><td class="before">Thiếu ở 913 ảnh trong bài</td><td class="after">4.130/4.130</td></tr>
+  <tr><td>Font chữ</td><td class="before">Tải từ Google Fonts</td><td class="after">Lưu trên website</td></tr>
+  <tr><td>Bộ nhớ đệm, header bảo mật</td><td class="before">Không cấu hình</td><td class="after">Có (Cloudflare _headers)</td></tr>
+  <tr><td>Mã GA4 / GTM / Search Console</td><td>Có</td><td class="after">Giữ nguyên văn trên mọi trang</td></tr>
   <tr><td>Nền tảng</td><td class="before">WordPress, từng bị hack</td><td class="after">Website tĩnh trên Cloudflare</td></tr>
 </table>
 
@@ -198,7 +220,10 @@ LIÊN HỆ                                                    [ BÁO GIÁ ]</div
 <ol>
   <li><b>Ngày triển khai:</b> gửi lại sitemap <code>/sitemap.xml</code> trong Google Search Console; kiểm tra ngẫu nhiên các chuyển hướng 301 (đặc biệt URL tiếng Việt có dấu và URL không có dấu "/" cuối).</li>
   <li><b>2–4 tuần đầu:</b> theo dõi báo cáo Lập chỉ mục và Hiệu suất hằng tuần; xử lý ngay URL lỗi 404 phát sinh (nếu có).</li>
-  <li><b>Nội dung bán hàng:</b> bổ sung mô tả, thông số, hình ảnh thực tế cho các trang Thiết bị và Giải pháp – đây là đòn bẩy chính cho các từ khoá đang ở vị trí 50–60. Nhóm "Sàng rung, cấp liệu &amp; phụ tùng SKF" hiện chưa có bài viết.</li>
+  <li><b>Nội dung trang Thiết bị và Giải pháp (ưu tiên cao):</b> mỗi trang hiện chỉ có đoạn giới thiệu khoảng 35 từ, trong khi đây là các trang nhắm từ khoá bán hàng đang ở vị trí 50–60 ("máy nghiền đá", "máy nghiền cát", "trạm nghiền đá"…). Đề xuất viết 300–600 từ mỗi trang: thông số kỹ thuật, ứng dụng, hình ảnh thực tế. <i>Cần công ty cung cấp thông tin kỹ thuật.</i> Nhóm "Sàng rung, cấp liệu &amp; phụ tùng SKF" hiện chưa có bài viết.</li>
+  <li><b>Thông tin doanh nghiệp trong dữ liệu có cấu trúc:</b> bổ sung liên kết mạng xã hội chính thức (<code>sameAs</code>: Facebook, YouTube, Zalo OA) cho Organization; toạ độ bản đồ và giờ làm việc cho LocalBusiness – giúp Google nhận diện thương hiệu và hiển thị trên Google Maps. <i>Cần công ty xác nhận toạ độ, giờ làm việc và danh sách kênh chính thức.</i></li>
+  <li><b>Thống nhất tên thương hiệu trong tiêu đề:</b> trang chủ đang dùng "| Thanh Long", các trang khác dùng "| Thế Giới Máy Nghiền Đá"; nên chọn một tên. 44 bài có tiêu đề gốc dài hơn 65 ký tự nên rút gọn khi biên tập lại.</li>
+  <li><b>Email theo tên miền:</b> email liên hệ hiện dùng tên miền khác (<code>@labcare.com.vn</code>); nên dùng email theo tên miền <code>thegioimaynghienda.com</code> để thông tin doanh nghiệp (NAP) nhất quán.</li>
   <li><b>Dự án:</b> mỗi trạm bàn giao mới nên có một bài (địa điểm, công suất, thiết bị, hình ảnh) – tăng độ tin cậy và từ khoá địa phương.</li>
   <li><b>Sau 3 tháng:</b> đánh giá lại trang tag (708 trang, phần lớn chỉ có 1 bài) dựa trên dữ liệu Search Console mới.</li>
 </ol>

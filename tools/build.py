@@ -38,7 +38,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261108k"
+CSS_VER = "20261108l"
 JS_VER = "20261103b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
@@ -394,6 +394,35 @@ def body_summary(node) -> str:
     return " ".join(parts)
 
 
+# Google Search Console verification, GA4, Google tag (Site Kit) and GTM, copied
+# verbatim from the old site (tools/data/tracking-*.html). Do not edit by hand.
+_TRACKING = None
+# favicon set (made from the old site's WordPress "Site Icon", tools/data/brand/site-icon-512.png)
+ICON_LINKS = ('<link rel="icon" href="/favicon.ico" sizes="48x48">\n'
+              '  <link rel="icon" href="/assets/img/icons/favicon-32.png" type="image/png" sizes="32x32">\n'
+              '  <link rel="icon" href="/assets/img/icons/icon-192.png" type="image/png" sizes="192x192">\n'
+              '  <link rel="apple-touch-icon" href="/assets/img/icons/apple-touch-icon.png">\n'
+              '  <link rel="manifest" href="/site.webmanifest">')
+
+
+def tracking_snippets():
+    global _TRACKING
+    if _TRACKING is None:
+        d = ROOT / "tools" / "data"
+        _TRACKING = ("<!-- tracking:start -->\n" + (d / "tracking-head.html").read_text(encoding="utf-8").strip() + "\n<!-- tracking:end -->",
+                     "<!-- tracking-body:start -->\n" + (d / "tracking-body.html").read_text(encoding="utf-8").strip() + "\n<!-- tracking-body:end -->")
+    return _TRACKING
+
+
+def add_tracking(page_html: str) -> str:
+    """Insert (or refresh) the tracking snippets: end of <head>, start of <body>."""
+    head_snip, body_snip = tracking_snippets()
+    page_html = re.sub(r"\s*<!-- tracking:start -->.*?<!-- tracking:end -->", "", page_html, flags=re.S)
+    page_html = re.sub(r"\s*<!-- tracking-body:start -->.*?<!-- tracking-body:end -->", "", page_html, flags=re.S)
+    page_html = page_html.replace("</head>", head_snip + "\n</head>", 1)
+    return re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + body_snip, page_html, count=1)
+
+
 def page_shell(*, path: str, title: str, description: str, canonical: str,
                body: str, nav: str, jsonld: list | None = None,
                noindex: bool = False, og_type: str = "website",
@@ -441,10 +470,7 @@ def page_shell(*, path: str, title: str, description: str, canonical: str,
   <meta name="twitter:description" content="{esc(description)}">
   <meta name="twitter:image" content="{esc(og_image)}">
   <meta name="theme-color" content="#0059b1">
-  <link rel="icon" href="{'../' * depth}assets/img/logo.webp" type="image/webp">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  {ICON_LINKS}
   <link rel="stylesheet" href="{'../' * depth}assets/css/style.css?v={CSS_VER}">
   {ld}
 </head>
@@ -471,6 +497,7 @@ def output_path(path: str) -> str:
 
 
 def write_page(path: str, content: str):
+    content = add_tracking(content)
     out = SITE / output_path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content, encoding="utf-8")
@@ -780,6 +807,22 @@ def describe_images(soup, root, post):
         new_fig.append(caption)
 
 
+_IMG_SIZES = {}
+
+
+def image_size(local: str):
+    """(width, height) of a local image file, or None. Width/height on <img> lets the
+    browser reserve space before the image loads (no layout shift / CLS)."""
+    if local not in _IMG_SIZES:
+        try:
+            from PIL import Image
+            with Image.open(SITE / local) as im:
+                _IMG_SIZES[local] = im.size
+        except Exception:
+            _IMG_SIZES[local] = None
+    return _IMG_SIZES[local]
+
+
 def sanitize(node, *, from_dir: str, model, image_map: dict, post=None) -> str:
     if node is None:
         return ""
@@ -854,6 +897,10 @@ def sanitize(node, *, from_dir: str, model, image_map: dict, post=None) -> str:
                 alt = post["title"]
             if alt:
                 attrs["alt"] = alt
+            local = urllib.parse.unquote(posixpath.normpath(posixpath.join(from_dir, attrs["src"]))) if not attrs["src"].startswith("http") else ""
+            size = image_size(local) if local else None
+            if size:
+                attrs["width"], attrs["height"] = str(size[0]), str(size[1])
             attrs["loading"] = "lazy"
             attrs["decoding"] = "async"
         elif name == "iframe":
@@ -1437,6 +1484,7 @@ def main():
     write_redirects(rows, routes, gone_pages)
     remove_stale_pages(routes)
     normalize_existing_heads()
+    generate_404()
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
 
@@ -1585,7 +1633,9 @@ def generate_article(path, post, model, by_section, routes):
     if not body_html:
         body_html = f"<p>{esc(post['description'] or post['title'])}</p><p>Nội dung chi tiết đang được cập nhật. Quý khách cần tư vấn cấu hình, vui lòng gọi <a href=\"tel:0912712772\">0912 712 772</a>.</p>"
     if "<img" not in body_html and post["thumb"]:
-        body_html = (f'<figure><img src="{esc(rel_url(from_dir, post["thumb"]))}" alt="{esc(post["title"])}" '
+        size = image_size(post["thumb"]) or ("", "")
+        dims = f' width="{size[0]}" height="{size[1]}"' if size[0] else ""
+        body_html = (f'<figure><img src="{esc(rel_url(from_dir, post["thumb"]))}" alt="{esc(post["title"])}"{dims} '
                      f'loading="lazy" decoding="async"><figcaption>{esc(post["title"])}</figcaption></figure>' + body_html)
     if post["is_primary"]:
         body_html = add_internal_links(body_html, path, from_dir, routes, post["section"])
@@ -2018,6 +2068,9 @@ def normalize_existing_heads():
             img = BASE + "/" + img.lstrip("./").lstrip("/")
         # drop tags we manage, then re-insert them after og:image
         head = re.sub(r'\n\s*<meta (?:name="robots"|property="og:url"|property="og:image:alt"|name="twitter:[a-z]+")[^>]*>', "", head)
+        head = re.sub(r'\n\s*<link rel="(?:icon|apple-touch-icon|manifest|shortcut icon)"[^>]*>', "", head)
+        head = re.sub(r'\n\s*<link rel="preconnect" href="https://fonts\.(?:googleapis|gstatic)\.com"[^>]*>|\n\s*<link href="https://fonts\.googleapis\.com/[^"]*" rel="stylesheet">', "", head)
+        head = head.replace('<meta name="theme-color" content="#0059b1">', '<meta name="theme-color" content="#0059b1">\n  ' + ICON_LINKS, 1)
         head = re.sub(r'<meta property="og:image" content="[^"]*">', f'<meta property="og:image" content="{esc(img)}">', head)
         tags = (f'\n  <meta property="og:image:alt" content="{esc(title)}">'
                 f'\n  <meta property="og:url" content="{esc(canon)}">'
@@ -2032,7 +2085,34 @@ def normalize_existing_heads():
                     "alternateName": "Thanh Long JSC", "url": BASE + "/", "inLanguage": "vi-VN",
                     "publisher": {"@type": "Organization", "name": "Thanh Long JSC", "url": BASE + "/"}}
             head += '  <script type="application/ld+json">\n' + json.dumps(site, ensure_ascii=False, indent=2) + "\n</script>\n"
-        f.write_text(head + "</head>" + rest, encoding="utf-8")
+        f.write_text(add_tracking(head + "</head>" + rest), encoding="utf-8")
+
+
+def generate_404():
+    """/404.html: Cloudflare serves it with status 404 for every unknown URL
+    (without it, Cloudflare Pages answers unknown URLs with the home page and 200).
+    It is served at any depth, so every link is made root-absolute."""
+    links = "".join(f'<a class="line-box reveal" href="{esc(landing)}"><h3>{esc(label)}</h3>'
+                    f'<span class="line-box__more">Xem<svg class="ico ico--sm"><use href="#i-right"/></svg></span></a>'
+                    for _, label, landing, _ in MENU)
+    body = f"""    <div class="page-title">
+      <div class="container">
+        <h1>Không tìm thấy trang</h1>
+      </div>
+    </div>
+    <section class="section">
+      <div class="container">
+        <div class="intro-note"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><p>Trang bạn tìm có thể đã được chuyển sang địa chỉ mới hoặc không còn tồn tại. Mời bạn chọn một mục bên dưới, quay về <a href="/">trang chủ</a> hoặc gọi <a href="tel:0912712772">0912 712 772</a> để được tư vấn.</p></div>
+        <div class="lines lines--page">{links}</div>
+      </div>
+    </section>
+{cta_band("")}"""
+    page = page_shell(path="/", title="Không tìm thấy trang | Thế Giới Máy Nghiền Đá",
+                      description="Trang không tồn tại hoặc đã được chuyển sang địa chỉ mới.",
+                      canonical=BASE + "/", body=body, nav="", noindex=True)
+    page = re.sub(r'\n\s*<link rel="canonical"[^>]*>|\n\s*<meta property="og:url"[^>]*>', "", page)
+    page = re.sub(r'((?:href|src)=")(?!https?:|//|/|#|tel:|mailto:|data:)([^"]*)"', r'\1/\2"', page)
+    (SITE / "404.html").write_text(add_tracking(page), encoding="utf-8")
 
 
 def remove_stale_pages(routes):
