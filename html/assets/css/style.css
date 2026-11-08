@@ -981,3 +981,12 @@ body.is-locked { overflow: hidden; }
 @media (min-width: 992px) {
   .steps { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 }
+/* section pages: clear space between stacked blocks (products, steps, videos, projects, articles) */
+.with-side__main .products + .sec-block,
+.with-side__main .steps + .sec-block,
+.with-side__main .vids + .sec-block,
+.with-side__main .posts + .sec-block,
+.with-side__main .sec-more + .sec-block,
+.with-side__main .table-wrap ~ .sec-block { margin-top: 48px; }
+.with-side__main .vids { margin-bottom: 0; }
+.with-side__main .sec-more { margin: 22px 0 0; }

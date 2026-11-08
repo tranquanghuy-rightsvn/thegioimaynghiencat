@@ -38,7 +38,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261108n"
+CSS_VER = "20261108o"
 JS_VER = "20261103b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
