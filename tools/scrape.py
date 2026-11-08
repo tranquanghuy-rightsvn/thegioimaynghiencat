@@ -67,8 +67,10 @@ def cache_name(url: str) -> Path:
 def fetch(url: str, force=False) -> tuple[str, int, str]:
     CACHE.mkdir(parents=True, exist_ok=True)
     path = cache_name(url)
+    meta = path.with_suffix(".url")
     if path.exists() and not force:
-        return path.read_text(encoding="utf-8", errors="replace"), 200, url
+        final = meta.read_text(encoding="utf-8").strip() if meta.exists() else url
+        return path.read_text(encoding="utf-8", errors="replace"), 200, final
     last_error = ""
     for attempt in range(3):
         try:
@@ -77,6 +79,7 @@ def fetch(url: str, force=False) -> tuple[str, int, str]:
                 body = resp.read().decode("utf-8", errors="replace")
                 final = resp.geturl()
                 path.write_text(body, encoding="utf-8")
+                meta.write_text(final, encoding="utf-8")
                 time.sleep(0.05)
                 return body, resp.status, final
         except urllib.error.HTTPError as exc:
@@ -318,6 +321,11 @@ def main():
                 "tags": data["tags"],
                 "node": data["node"],
             })
+
+    # Threads finish in random order; keep the audit order so builds are
+    # reproducible (duplicate resolution and listing order depend on it).
+    order = {item["url"]: n for n, item in enumerate(items)}
+    results.sort(key=lambda r: order[r["url"]])
 
     # Save raw parsed nodes separately so sanitisation/downloading can iterate
     # without re-fetching. Pickle keeps BeautifulSoup nodes intact.

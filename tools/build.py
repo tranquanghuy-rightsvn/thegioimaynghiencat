@@ -36,8 +36,9 @@ from pathlib import Path
 from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
 ROOT = Path(__file__).resolve().parent.parent
+SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261103b"
+CSS_VER = "20261108a"
 JS_VER = "20261103b"
 PER_PAGE = 10
 
@@ -83,10 +84,97 @@ CATEGORIES = {
     },
 }
 
-PRODUCT_CATEGORIES = {
-    "may-nghien-da": "Máy nghiền đá",
-    "may-lam-cat": "Máy làm cát nhân tạo",
+# ---------------------------------------------------------------------------
+# Site structure (main menu). Every article belongs to exactly one section,
+# listed in tools/data/structure.tsv (generate/edit with tools/classify.py).
+# URLs follow the menu (/san-pham/<nhóm>/, /giai-phap/<...>/, /dich-vu/<...>/,
+# /kien-thuc/<...>/). Sections that already had an indexed URL on the old site
+# keep it (/category/tin-tuc/, tu-van-ky-thuat, du-an-cong-trinh,
+# sua-chua-lap-dat); old pagination that no longer exists is 301-redirected.
+# ---------------------------------------------------------------------------
+MENU = [  # (key, label, landing page, data-nav used for the active state)
+    ("thiet-bi", "Thiết bị", "/san-pham/", "san-pham"),
+    ("giai-phap", "Giải pháp", "/giai-phap/", "giai-phap"),
+    ("du-an", "Dự án", "/category/du-an-cong-trinh/", "du-an"),
+    ("dich-vu", "Dịch vụ", "/dich-vu/", "dich-vu"),
+    ("kien-thuc", "Kiến thức", "/nhan-bao-gia/", "tin-tuc"),
+]
+MENU_BY_KEY = {m[0]: m for m in MENU}
+
+SECTIONS = {
+    # Thiết bị: product cards (by name, from /san-pham/) + articles
+    "tb-nghien-da": {"parent": "thiet-bi", "name": "Máy nghiền đá", "path": "/san-pham/may-nghien-da/",
+                     "products": ["Máy nghiền hàm", "Máy nghiền côn", "Máy nghiền phản kích", "Máy nghiền búa"],
+                     "intro": "Máy nghiền hàm, nghiền côn, phản kích và nghiền búa cho dây chuyền đá xây dựng 50 – 2.000 tấn/giờ: nghiền thô, nghiền trung và nghiền mịn theo loại đá và sản phẩm đầu ra."},
+    "tb-lam-cat": {"parent": "thiet-bi", "name": "Máy làm cát nhân tạo VSI", "path": "/san-pham/may-lam-cat/",
+                   "products": ["Máy làm cát VSI"],
+                   "intro": "Máy làm cát VSI vo đá ra cát hạt khối, tỷ lệ cát 35 – 50%, tiền điện chỉ khoảng 3.750 đồng mỗi khối cát. Nghiền đá, sỏi sông, đá cát kết thành cát xây dựng."},
+    "tb-rua-cat": {"parent": "thiet-bi", "name": "Máy rửa cát & thu hồi cát mịn", "path": "/san-pham/may-rua-cat/",
+                   "products": ["Máy rửa cát dạng guồng", "Máy tách cát mịn", "Máy rửa cát McLanahan", "Máy ép bùn"],
+                   "intro": "Máy rửa cát dạng guồng, máy tách cát mịn thu hồi hạt 0,16 – 3 mm, hệ thống rửa cát UltraWash của McLanahan và máy ép bùn xử lý nước thải sau rửa."},
+    "tb-di-dong": {"parent": "thiet-bi", "name": "Trạm nghiền di động", "path": "/san-pham/tram-nghien-di-dong/",
+                   "products": ["Trạm nghiền di động"],
+                   "intro": "Trạm nghiền di động không cần móng, di chuyển theo mỏ và công trường: phù hợp mỏ đá trữ lượng nhỏ, rải rác, khu công nghiệp và nghiền tái chế tại chỗ."},
+    "tb-tuyen-quang": {"parent": "thiet-bi", "name": "Thiết bị tuyển quặng", "path": "/san-pham/thiet-bi-tuyen-quang/",
+                       "products": ["Máy nghiền bi"],
+                       "intro": "Máy nghiền bi nghiền mịn quặng, khoáng sản và thiết bị tuyển từ, phân cấp cho trạm tuyển quặng sắt."},
+    "tb-sang-phu-tung": {"parent": "thiet-bi", "name": "Sàng rung, cấp liệu & phụ tùng SKF", "path": "/san-pham/sang-rung-phu-tung/",
+                         "products": ["Sàng rung phân loại", "Bạc đạn cầu rãnh sâu", "Bạc đạn đũa côn", "Bạc đạn tang trống", "Gối đỡ vòng bi SKF"],
+                         "intro": "Sàng rung phân loại tách cỡ 0–5, 5–10, 10–20, 20–40 mm và vòng bi SKF chính hãng cho máy nghiền, sàng rung: bạc đạn cầu, đũa côn, tang trống, gối đỡ SNL, SY."},
+    # Giải pháp: production lines by what the customer wants to make
+    "gp-nghien-da": {"parent": "giai-phap", "name": "Dây chuyền nghiền đá xây dựng", "path": "/giai-phap/day-chuyen-nghien-da/",
+                     "products": ["Dây chuyền nghiền đồng bộ"], "capacity": True,
+                     "intro": "Dây chuyền nghiền sàng đá 1x2, 4x6, đá cấp phối, đá mi từ 50 đến 2.000 tấn/giờ, cung cấp trọn gói chìa khóa trao tay từ khảo sát mỏ, thiết kế, lắp đặt đến chuyển giao vận hành."},
+    "gp-cat-nhan-tao": {"parent": "giai-phap", "name": "Dây chuyền sản xuất cát nhân tạo", "path": "/giai-phap/day-chuyen-cat-nhan-tao/",
+                        "products": ["Dây chuyền cát nhân tạo", "Máy làm cát VSI"],
+                        "intro": "Dây chuyền làm cát nhân tạo từ đá, sỏi sông, sỏi đồi và đá cát kết: nghiền, vo hạt bằng máy VSI, sàng phân loại, rửa và thu hồi cát mịn đạt tiêu chuẩn cát xây dựng."},
+    "gp-rua-cat": {"parent": "giai-phap", "name": "Dây chuyền rửa cát", "path": "/giai-phap/day-chuyen-rua-cat/",
+                   "products": ["Máy rửa cát dạng guồng", "Máy tách cát mịn", "Máy ép bùn"],
+                   "intro": "Hệ thống rửa cát đồi, cát biển, cát lẫn cao lanh thành cát sạch: sàng rửa, guồng rửa, thu hồi cát mịn và xử lý nước thải, ép bùn để tuần hoàn nước."},
+    "gp-tuyen-quang": {"parent": "giai-phap", "name": "Dây chuyền tuyển quặng sắt", "path": "/giai-phap/day-chuyen-tuyen-quang/",
+                       "products": ["Dây chuyền nghiền quặng thô", "Máy nghiền bi"],
+                       "intro": "Trạm nghiền, nghiền bi và tuyển từ quặng sắt: loại bỏ tạp chất, nâng hàm lượng quặng tinh cho mỏ quặng sắt, mangan và khoáng sản kim loại."},
+    "gp-tai-che": {"parent": "giai-phap", "name": "Tái chế bê tông, phế thải xây dựng", "path": "/giai-phap/tai-che-phe-thai-xay-dung/",
+                   "products": ["Trạm nghiền di động"],
+                   "intro": "Nghiền tái chế bê tông, gạch đá thải từ công trường thành cốt liệu: giảm chi phí vận chuyển, đổ thải và tận dụng lại vật liệu ngay tại chỗ."},
+    # Dự án
+    "du-an": {"parent": "du-an", "name": "Dự án", "path": "/category/du-an-cong-trinh/",
+              "intro": "Trạm nghiền đá, dây chuyền cát nhân tạo và trạm tuyển quặng Thanh Long JSC đã cung cấp, lắp đặt, chạy thử và bàn giao cho khách hàng."},
+    # Dịch vụ
+    "dv-bao-tri": {"parent": "dich-vu", "name": "Bảo trì, sửa chữa", "path": "/category/sua-chua-lap-dat/",
+                   "intro": "Bảo trì định kỳ, sửa chữa, xử lý sự cố và thay thế vật tư cho máy nghiền hàm, nghiền côn, máy làm cát và trạm nghiền."},
+    "dv-may-cu": {"parent": "dich-vu", "name": "Máy cũ & thanh lý", "path": "/dich-vu/may-cu-thanh-ly/",
+                  "intro": "Kinh nghiệm mua máy nghiền đá, trạm nghiền cũ và thông tin thanh lý trạm nghiền."},
+    # Kiến thức
+    "kt-ky-thuat": {"parent": "kien-thuc", "name": "Kỹ thuật & vận hành", "path": "/category/tu-van-ky-thuat/",
+                    "intro": "Chọn máy theo loại đá, quy trình khai thác và sản xuất đá xây dựng, vận hành an toàn và tối ưu năng suất máy nghiền."},
+    "kt-cat-vlxd": {"parent": "kien-thuc", "name": "Cát nhân tạo & vật liệu xây dựng", "path": "/kien-thuc/cat-nhan-tao-vat-lieu-xay-dung/",
+                    "intro": "Cát nhân tạo là gì, tiêu chuẩn cát nghiền, so sánh cát nhân tạo và cát tự nhiên, ứng dụng trong bê tông, cầu đường và gạch không nung."},
+    "kt-thi-truong": {"parent": "kien-thuc", "name": "Thị trường & giá", "path": "/category/tin-tuc/",
+                      "intro": "Giá đá, giá cát xây dựng, thị trường vật liệu theo từng tỉnh và nhu cầu vật liệu cho các dự án cao tốc, sân bay."},
 }
+SECTION_BY_PATH = {v["path"]: k for k, v in SECTIONS.items()}
+# Dịch vụ menu also has the hand-built service page
+SERVICE_LINKS = [("Lắp đặt & chuyển giao", "/dich-vu/")]
+LEGACY_CATEGORIES = {"video"}  # old WordPress categories still kept as they were
+
+
+def section_children(parent):
+    return [(k, v) for k, v in SECTIONS.items() if v["parent"] == parent and k != parent]
+
+
+def load_structure():
+    path = ROOT / "tools" / "data" / "structure.tsv"
+    out = {}
+    for line in path.read_text(encoding="utf-8").splitlines()[1:]:
+        if not line.strip():
+            continue
+        slug, section, *_ = line.split("\t")
+        if section not in SECTIONS:
+            raise SystemExit(f"structure.tsv: chuyên mục '{section}' của '{slug}' không có trong SECTIONS")
+        out[unicodedata.normalize("NFC", slug)] = section
+    return out
+
 
 FEATURED_CATEGORIES = {
     "design": "Design",
@@ -97,6 +185,43 @@ FEATURED_MEMBERS = {
                "flatsome-poster-print", "magazine", "portfolio-typography"},
     "lookbook": {"flat-t-shirt-company", "lookbook-summer"},
 }
+
+# Misspelt tags folded into the correct one (both marked in urls.html).
+TAG_MERGE = {
+    "nghien-ca": "nghien-cat",
+    "may-lam": "may-lam-cat",
+    "may-nghien-han": "may-nghien-ham",
+}
+
+# The only outside sites articles may still link to: the company's own
+# Zalo / Facebook / YouTube channels. Every other outbound link is unwrapped.
+ALLOWED_EXTERNAL = {"zalo.me", "chat.zalo.me", "youtube.com", "m.youtube.com", "youtu.be",
+                    "facebook.com", "m.facebook.com", "fb.com"}
+
+# Old sister site labcare.com.vn: send its links to the matching page here.
+# Paths with no equivalent are unwrapped (text kept, link dropped).
+LABCARE_MAP = {
+    "": "/",
+    "nhan-bao-gia": "/bao-gia/",
+    "gioi-thieu": "/gioithieu/",
+    "tu-van-ky-thuat": "/category/tu-van-ky-thuat/",
+    "may-nghien-con": "/product/may-nghien-con/",
+    "may-kep-ham": "/cau-tao-may-kep-ham/",
+    "may-rua-cat-kieu-guong": "/may-rua-cat-guong-quay-trong-cong-nghe-san-xuat-cat/",
+    "may-rua-cat-kieu-guong-quay-banh-xe": "/may-rua-cat-guong-quay-trong-cong-nghe-san-xuat-cat/",
+    "thu-hoi-cat-min-tu-nuoc-rua-cat": "/may-thu-hoi-cat-min/",
+    "4nhasanxuatmaynghiendalonnhatthegioiholaai": "/bao-gia-day-chuyen-nghien-da-xay-dung/",
+    "4-nha-san-xuat-may-nghien-da-lon-nhat-the-gioi-ho-la-ai": "/bao-gia-day-chuyen-nghien-da-xay-dung/",
+    "may-rua-cat-mclanahan-dong-ultrawash": "/may-rua-cat-xay-dung-mclanahan-thiet-bi-rua-cat-hien-dai-nhat-the-gioi/",
+    "12-meo-toi-uu-nang-suat-may-nghien-con": "/toi-uu-hieu-suat-may-nghien-con/",
+    "cat-nhan-tao-la-gi-so-sanh-cat-nhan-tao-va-cat-tu-nhien": "/may-nghien-cat-nhan-tao-la-gi-so-sanh-cat-nhan-tao-cat-tu-nhien/",
+    "quy-trinh-san-xuat-cat-nhan-tao": "/cong-nghe-san-xuat-cat-nhan-tao/",
+    "may-nghien-bua": "/may-nghien-bua-truc-ngang/",
+    "cat-nghien-tu-da-cat-ket-vsi-barmac-metso": "/cat-nghien-nhan-tao-tu-da-cat-ket/",
+    "day-chuyen-rua-cat-doi": "/day-chuyen-rua-cat-doi-va-cac-cong-nghe-san-co/",
+}
+
+PHONE_TEXT = re.compile(r"\+?[\d][\d\s.\-()]{7,}\d")
 
 MONTHS = {1: "Th1", 2: "Th2", 3: "Th3", 4: "Th4", 5: "Th5", 6: "Th6",
           7: "Th7", 8: "Th8", 9: "Th9", 10: "Th10", 11: "Th11", 12: "Th12"}
@@ -132,6 +257,10 @@ def unquote_path(path: str) -> str:
         return urllib.parse.unquote(path)
     except Exception:
         return path
+
+
+def tag_key(slug: str) -> str:
+    return unicodedata.normalize("NFC", unquote_path(slug))
 
 
 def esc(value: str) -> str:
@@ -173,7 +302,7 @@ URL_ATTR = re.compile(r'(\s(?:href|src))="(?!https?:|//|#|tel:|mailto:|data:|jav
 
 
 def layout_blocks():
-    source = (ROOT / "index.html").read_text(encoding="utf-8")
+    source = (SITE / "index.html").read_text(encoding="utf-8")
     out = {}
     for name in ("header", "footer"):
         m = re.search(rf"[ \t]*<!-- layout:{name}\b.*?<!-- /layout:{name} -->", source, re.S)
@@ -275,7 +404,7 @@ def output_path(path: str) -> str:
 
 
 def write_page(path: str, content: str):
-    out = ROOT / output_path(path)
+    out = SITE / output_path(path)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content, encoding="utf-8")
 
@@ -290,11 +419,23 @@ def page_dir(path: str) -> str:
 def build_model(raw, kept):
     image_map = json.loads((ROOT / "tools" / "data" / "images.json").read_text(encoding="utf-8"))
     kept_tags = {k["path"].rstrip("/").split("/tag/")[-1]: k for k in kept if k["kind"] == "tag"}
+    # Scraped tag slugs keep the site's raw percent-encoding (e.g.
+    # "ba%cc%89o-tri-..."), while audit paths are decoded and may use another
+    # Unicode normalisation form. Map each scraped slug onto the audit's exact
+    # spelling, or every Vietnamese-diacritic tag silently drops out.
+    by_key = {tag_key(slug): slug for slug in kept_tags}
+    for p in raw:
+        for t in p.get("tags", []):
+            t["slug"] = by_key.get(tag_key(t["slug"]), t["slug"])
+            t["slug"] = TAG_MERGE.get(t["slug"], t["slug"])
     kept_paths = {k["path"] for k in kept}
 
     posts = [p for p in raw if p["kind"] == "post/page" and p["path"] not in EXISTING and p["path"] != "/nhan-bao-gia/"]
     products = [p for p in raw if p["kind"] == "product"]
-    featured = [p for p in raw if p["kind"] == "featured_item" and p["path"] not in {"/featured_item/"}]
+    catalog = load_catalog()
+    kept_paths |= {v["path"] for v in SECTIONS.values()} | {"/giai-phap/"}
+    featured = [p for p in raw if p["kind"] == "featured_item" and p["path"] not in {"/featured_item/"}
+                and p["path"] in kept_paths]
 
     # Duplicate detection: same headline + same publish date. The URL that is
     # the redirect target wins; the others become canonical aliases.
@@ -322,7 +463,7 @@ def build_model(raw, kept):
     for p in posts:
         dt = parse_date(p["date"])
         cats = [c for c in p["categories"] if c["slug"] in CATEGORIES]
-        tags = [t for t in p["tags"] if t["slug"] in kept_tags]
+        tags = list({t["slug"]: t for t in reversed(p["tags"]) if t["slug"] in kept_tags}.values())[::-1]
         primary_cat = cats[0]["slug"] if cats else "tin-tuc"
         image = p.get("image") or ""
         mapped = image_map.get(image)
@@ -345,6 +486,19 @@ def build_model(raw, kept):
             "is_article": bool(dt),
         }
 
+    # Section of each article (one per article; aliases follow their primary).
+    structure = load_structure()
+    unplaced = []
+    for p in post_by_path.values():
+        key = unicodedata.normalize("NFC", p["primary_path"].strip("/"))
+        p["section"] = structure.get(key)
+        if p["section"] is None:
+            p["section"] = "kt-ky-thuat"
+            if p["is_primary"] and p["is_article"]:
+                unplaced.append(p["path"])
+    if unplaced:
+        print(f"structure.tsv: {len(unplaced)} bài chưa xếp chuyên mục (tạm vào kt-ky-thuat), chạy tools/classify.py: {unplaced[:5]}")
+
     # Primary articles only, newest first.
     primary_posts = sorted([p for p in post_by_path.values() if p["is_primary"] and p["is_article"]],
                            key=lambda p: p["dt"], reverse=True)
@@ -366,6 +520,7 @@ def build_model(raw, kept):
         "posts": post_by_path,
         "primary_posts": primary_posts,
         "products": products,
+        "catalog": catalog,
         "featured": featured,
         "tag_names": tag_names,
     }
@@ -411,6 +566,9 @@ def sanitize(node, *, from_dir: str, model, image_map: dict) -> str:
         attrs = {}
         if name == "a":
             href = (tag.get("href") or "").strip()
+            text = tag.get_text(" ", strip=True)
+            if PHONE_TEXT.fullmatch(text) and not href.startswith(("tel:", "https://zalo.me", "http://zalo.me")):
+                href = "tel:" + re.sub(r"[^\d+]", "", text)
             new_href = internal_href(href, from_dir, model)
             if new_href is None:
                 tag.unwrap()
@@ -493,8 +651,14 @@ def internal_href(href: str, from_dir: str, model) -> str | None:
         return "https:" + href
     parsed = urllib.parse.urlparse(href)
     if parsed.scheme in ("http", "https"):
-        if parsed.netloc not in ("thegioimaynghienda.com", "www.thegioimaynghienda.com"):
-            return href
+        host = parsed.netloc.lower().removeprefix("www.")
+        if host == "labcare.com.vn":
+            target = LABCARE_MAP.get(unquote_path(parsed.path).strip("/"))
+            if target is None and ("/" + unquote_path(parsed.path).strip("/") + "/") in model["kept_paths"]:
+                target = "/" + unquote_path(parsed.path).strip("/") + "/"
+            return internal_href(target, from_dir, model) if target else None
+        if host != "thegioimaynghienda.com":
+            return href if host in ALLOWED_EXTERNAL else None
         path = unquote_path(parsed.path) or "/"
         if path in ("/wp-login.php", "/xmlrpc.php", "/feed/") or "/wp-admin" in path:
             return None
@@ -507,8 +671,15 @@ def internal_href(href: str, from_dir: str, model) -> str | None:
 
     if not path.endswith("/") and "." not in Path(path).name:
         path += "/"
+    routes = model.get("routes")
+    if routes is not None and path not in routes:
+        m = re.match(r"^(.*/)page/\d+/$", path)
+        if m and m.group(1) in routes:  # pagination that no longer exists
+            return rel_url(from_dir, m.group(1))
     if path in model["kept_paths"]:
         return rel_url(from_dir, path)
+    if path in model.get("redirect_to", {}):
+        return rel_url(from_dir, model["redirect_to"][path])
     # Alias/duplicate post -> canonical target.
     if path in model["posts"]:
         target = model["posts"][path]["primary_path"]
@@ -543,27 +714,12 @@ def post_card(post, from_dir: str, *, meta: str | None = None) -> str:
         date_text = fmt_date(dt)
     cat = meta
     if cat is None:
-        cat = CATEGORIES[post["primary_cat"]]["name"] if post.get("primary_cat") in CATEGORIES else "Tin tức"
+        cat = SECTIONS[post["section"]]["name"] if post.get("section") in SECTIONS else "Kiến thức"
     meta_line = " · ".join(x for x in (date_text, cat) if x)
     return f"""<a class="post reveal" href="{esc(rel_url(from_dir, post['path']))}">
             <div class="post__img"><img src="{esc(thumb_src(post, from_dir))}" alt="{esc(post['title'])}" width="640" height="400" loading="lazy">{date_badge}</div>
             <h3>{esc(post['title'])}</h3>
             <p class="post__meta"><svg class="ico"><use href="#i-clock"/></svg>{esc(meta_line)}</p>
-          </a>"""
-
-
-def product_card(product, from_dir: str, image_map: dict) -> str:
-    image = image_map.get(product.get("image", ""))
-    if not image:
-        for img in product["node"].find_all("img"):
-            src = (img.get("data-src") or img.get("src") or "").split(" ")[0]
-            if image_map.get(src):
-                image = image_map[src]
-                break
-    img = rel_url(from_dir, image) if image else rel_url(from_dir, "assets/img/vat-lieu.webp")
-    return f"""<a class="product reveal" href="{esc(rel_url(from_dir, product['path']))}">
-            <span class="product__img product__img--white"><img src="{esc(img)}" alt="{esc(product['title'])}" width="400" height="400" loading="lazy"></span>
-            <span class="product__txt"><h4>{esc(product['title'])}</h4><p>Thiết bị nghiền sàng</p><span class="product__btn">Xem chi tiết</span></span>
           </a>"""
 
 
@@ -621,11 +777,12 @@ def cta_band(from_dir: str) -> str:
 def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
                   intro: str, posts: list, from_dir: str, crumbs_items,
                   canonical: str, title: str, description: str,
-                  nav: str, noindex: bool, item_label: str = "bài viết") -> str:
+                  nav: str, noindex: bool, item_label: str = "bài viết",
+                  lead_html: str = "", hide_empty: bool = False) -> str:
     cards = "\n          ".join(post_card(p, from_dir) for p in posts)
     empty = '<p class="list-empty" hidden>Không tìm thấy bài viết phù hợp.</p>'
     if not posts:
-        empty = '<p class="list-empty">Chưa có bài viết trong chuyên mục này.</p>'
+        empty = "" if hide_empty else '<p class="list-empty">Chưa có bài viết trong chuyên mục này.</p>'
     pager = pagination(base_path, page_no, total_pages, from_dir)
     count = len(posts)
     list_tools = f"""<div class="list-tools reveal">
@@ -640,6 +797,7 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
     <section class="section">
       <div class="container">
         <p class="intro reveal">{intro}</p>
+        {lead_html}
         {list_tools}
         <div class="posts posts--3">
           {cards}
@@ -678,6 +836,15 @@ def main():
     rows, kept = load_audit()
     raw = pickle.load(open(ROOT / "tools" / "data" / "raw.pkl", "rb"))
     model = build_model(raw, kept)
+    # URLs the old site already 301-redirects (urls.html: "Xoá" + merge target)
+    model["redirect_to"] = {}
+    for url, status, kind, in_sitemap, rec, reason, merge in rows:
+        if rec == "Xoá" and merge and str(status) == "301":
+            src, dst = url_path(url.strip().rstrip(".")), url_path(merge)
+            if not src.endswith("/") and "." not in Path(src).name:
+                src += "/"
+            if src != dst:
+                model["redirect_to"][src] = dst
     image_map = model["image_map"]
     primary_posts = model["primary_posts"]
     post_by_path = model["posts"]
@@ -692,6 +859,8 @@ def main():
 
     # --- posts -------------------------------------------------------------
     for path, post in post_by_path.items():
+        if path not in model["kept_paths"]:
+            continue
         add_route(path, "post", post["title"], post=post,
                   canonical=post["path"] if post["is_primary"] else post["primary_path"],
                   index=post["is_primary"] and post["is_article"])
@@ -699,6 +868,10 @@ def main():
     # --- categories + pagination ------------------------------------------
     cat_pages = {}
     for slug, meta in CATEGORIES.items():
+        if slug not in LEGACY_CATEGORIES:
+            continue  # replaced by SECTIONS
+        if f"/category/{slug}/" not in model["kept_paths"]:
+            continue  # dropped by the audit (e.g. empty category)
         members = [p for p in primary_posts if any(c["slug"] == slug for c in p["categories_data"])]
         total = max(1, math.ceil(len(members) / PER_PAGE))
         cat_pages[slug] = (members, total)
@@ -708,13 +881,26 @@ def main():
             add_route(page_url(base, n), "pagination", f"{meta['name']} – Trang {n}",
                       members=members, total=total, page=n, base=base, slug=slug, index=False)
 
+    # --- sections (main menu) + pagination ---------------------------------
+    section_pages = {}
+    for key, sec in SECTIONS.items():
+        members = [p for p in primary_posts if p["section"] == key]
+        total = max(1, math.ceil(len(members) / PER_PAGE))
+        section_pages[key] = (members, total)
+        base = sec["path"]
+        add_route(base, "section", sec["name"], members=members, total=total, section=key, index=True)
+        for n in range(2, total + 1):
+            add_route(page_url(base, n), "section-pagination", f"{sec['name']} – Trang {n}",
+                      members=members, total=total, page=n, base=base, section=key, index=False)
+    add_route("/giai-phap/", "solutions", "Giải pháp", index=True)
+
     # --- blog archive ------------------------------------------------------
     blog_members = primary_posts
     blog_total = max(1, math.ceil(len(blog_members) / PER_PAGE))
-    add_route("/nhan-bao-gia/", "blog", "Tin tức & tư vấn", members=blog_members,
+    add_route("/nhan-bao-gia/", "blog", "Kiến thức", members=blog_members,
               total=blog_total, index=True)
     for n in range(2, blog_total + 1):
-        add_route(f"/nhan-bao-gia/page/{n}/", "blog-pagination", f"Tin tức & tư vấn – Trang {n}",
+        add_route(f"/nhan-bao-gia/page/{n}/", "blog-pagination", f"Kiến thức – Trang {n}",
                   members=blog_members, total=blog_total, page=n, base="/nhan-bao-gia/", index=False)
 
     # --- tags --------------------------------------------------------------
@@ -736,23 +922,21 @@ def main():
 
     # --- products ----------------------------------------------------------
     for product in model["products"]:
-        add_route(product["path"], "product", product["title"], product=product, index=True)
-    for slug, name in PRODUCT_CATEGORIES.items():
-        add_route(f"/product-category/{slug}/", "product-category", name,
-                  members=model["products"], slug=slug, index=True)
+        if product["path"] in model["kept_paths"]:
+            add_route(product["path"], "product", product["title"], product=product, index=True)
 
     # --- featured items ----------------------------------------------------
     for item in model["featured"]:
         if item["path"].startswith("/featured_item_category/"):
             continue
         add_route(item["path"], "featured", item["title"], item=item, index=False)
-    add_route("/featured_item/", "featured-archive", "Dự án tiêu biểu",
-              members=[i for i in model["featured"] if not i["path"].startswith("/featured_item_category/")],
-              index=False)
+    if "/featured_item/" in model["kept_paths"]:
+        add_route("/featured_item/", "featured-archive", "Dự án tiêu biểu",
+                  members=[i for i in model["featured"] if not i["path"].startswith("/featured_item_category/")],
+                  index=False)
     for slug, name in FEATURED_CATEGORIES.items():
-        members = [i for i in model["featured"]
-                   if i["path"].startswith("/featured_item/")
-                   and any(slug in (t["slug"] if isinstance(t, dict) else "") for t in [])]
+        if f"/featured_item_category/{slug}/" not in model["kept_paths"]:
+            continue
         add_route(f"/featured_item_category/{slug}/", "featured-category", name,
                   members=[], slug=slug, index=False)
 
@@ -762,7 +946,7 @@ def main():
     # static pages that are not articles (theme demos etc.)
     # ------------------------------------------------------------------
     for path, post in post_by_path.items():
-        if post["is_article"]:
+        if post["is_article"] or path not in model["kept_paths"]:
             continue
         if routes.get(path, {}).get("kind", "post") != "post":
             continue
@@ -794,15 +978,21 @@ def main():
     # ------------------------------------------------------------------
     # articles
     # ------------------------------------------------------------------
-    by_cat = defaultdict(list)
+    by_section = defaultdict(list)
     for p in primary_posts:
-        for c in p["categories_data"]:
-            by_cat[c["slug"]].append(p)
+        by_section[p["section"]].append(p)
 
     for path, post in post_by_path.items():
-        if not post["is_article"]:
+        if not post["is_article"] or path not in routes:
             continue
-        generate_article(path, post, model, by_cat, routes)
+        generate_article(path, post, model, by_section, routes)
+
+    # ------------------------------------------------------------------
+    # section pages (main menu) + "Giải pháp" landing
+    # ------------------------------------------------------------------
+    for key, (members, total) in section_pages.items():
+        generate_section(key, members, total, model)
+    generate_solutions_landing(section_pages)
 
     # ------------------------------------------------------------------
     # category archives (+ pagination)
@@ -836,17 +1026,18 @@ def main():
         page_path = base if n == 1 else f"/nhan-bao-gia/page/{n}/"
         from_dir = page_dir(page_path)
         chunk = blog_members[(n - 1) * PER_PAGE:n * PER_PAGE]
-        cr = [("Trang chủ", "/"), ("Tin tức & tư vấn", base if n > 1 else None)]
+        cr = [("Trang chủ", "/"), ("Kiến thức", base if n > 1 else None)]
         if n > 1:
             cr.append((f"Trang {n}", None))
         out = archive_page(
             base_path=base, page_no=n, total_pages=blog_total,
-            h1="Tin tức & tư vấn" if n == 1 else f"Tin tức & tư vấn – Trang {n}",
-            intro="Tổng hợp tin hoạt động, kinh nghiệm chọn thiết bị và tư vấn kỹ thuật từ Thanh Long JSC.",
+            h1="Kiến thức" if n == 1 else f"Kiến thức – Trang {n}",
+            intro="Toàn bộ bài viết của Thanh Long JSC: kinh nghiệm chọn thiết bị, công nghệ làm cát nhân tạo, vận hành trạm nghiền và thị trường vật liệu xây dựng.",
+            lead_html=section_nav("kien-thuc", None, from_dir) if n == 1 else "",
             posts=chunk, from_dir=from_dir, crumbs_items=cr,
             canonical=BASE + page_path,
-            title=("Tin tức & tư vấn | Thế Giới Máy Nghiền Đá" if n == 1 else f"Tin tức & tư vấn – Trang {n} | Thế Giới Máy Nghiền Đá"),
-            description="Tin tức, kinh nghiệm và tư vấn kỹ thuật về máy nghiền đá, cát nhân tạo, dây chuyền nghiền sàng.",
+            title=("Kiến thức máy nghiền, cát nhân tạo | Thế Giới Máy Nghiền Đá" if n == 1 else f"Kiến thức – Trang {n} | Thế Giới Máy Nghiền Đá"),
+            description="Kiến thức về máy nghiền đá, cát nhân tạo, dây chuyền nghiền sàng, vận hành trạm nghiền và thị trường vật liệu xây dựng.",
             nav="tin-tuc", noindex=n > 1)
         write_page(page_path, out)
 
@@ -881,32 +1072,8 @@ def main():
     # products
     # ------------------------------------------------------------------
     for product in model["products"]:
-        generate_product(product, model)
-
-    for slug, name in PRODUCT_CATEGORIES.items():
-        path = f"/product-category/{slug}/"
-        from_dir = page_dir(path)
-        cards = "\n          ".join(product_card(p, from_dir, image_map) for p in model["products"])
-        body = f"""    <div class="page-title">
-      <div class="container">
-        <h1>{esc(name)}</h1>
-        {crumbs([("Trang chủ", "/"), ("Sản phẩm", "/san-pham/"), (name, None)], from_dir)}
-      </div>
-    </div>
-    <section class="section">
-      <div class="container">
-        <p class="intro reveal">Thiết bị do Thanh Long JSC cung cấp, lắp đặt và bảo hành tại Việt Nam. Liên hệ 0912 712 772 để được tư vấn cấu hình.</p>
-        <div class="products">
-          {cards}
-        </div>
-      </div>
-    </section>
-{cta_band(from_dir)}"""
-        jsonld = [{"@context": "https://schema.org", "@type": "CollectionPage", "name": name,
-                   "url": BASE + path, "description": f"Danh mục {name} – Thanh Long JSC."}]
-        write_page(path, page_shell(path=path, title=f"{name} | Thế Giới Máy Nghiền Đá",
-                                    description=f"Danh mục {name}: máy nghiền đá, máy làm cát nhân tạo, thiết bị nghiền sàng Thanh Long JSC.",
-                                    canonical=BASE + path, body=body, nav="san-pham", jsonld=jsonld))
+        if product["path"] in routes:
+            generate_product(product, model)
 
     # ------------------------------------------------------------------
     # featured items / categories
@@ -932,22 +1099,30 @@ def main():
     for p in sitemap_urls:
         priority = "1.0" if p == "/" else "0.7" if p.startswith("/tag/") else "0.8"
         entries.append(f"  <url><loc>{esc(BASE + p)}</loc><lastmod>{today}</lastmod><priority>{priority}</priority></url>")
-    (ROOT / "sitemap.xml").write_text(
+    (SITE / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "\n".join(entries) + "\n</urlset>\n", encoding="utf-8")
-    (ROOT / "robots.txt").write_text(
+    # old pagination of re-scoped listings (e.g. /category/tu-van-ky-thuat/page/15/)
+    gone_pages = {p: re.sub(r"page/\d+/$", "", p) for p in model["kept_paths"]
+                  if p not in routes and re.search(r"/page/\d+/$", p) and re.sub(r"page/\d+/$", "", p) in routes}
+    write_redirects(rows, routes, gone_pages)
+    remove_stale_pages(routes)
+    (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
 
     # ------------------------------------------------------------------
     # audit report
     # ------------------------------------------------------------------
     kept_paths = {k["path"] for k in kept}
-    missing = sorted(p for p in kept_paths if p not in routes)
-    extra = sorted(p for p in routes if p not in kept_paths and p not in EXISTING)
+    missing = sorted(p for p in kept_paths if p not in routes and p not in gone_pages)
+    product_paths = {v["path"] for v in SECTIONS.values()} | {"/giai-phap/"}
+    product_paths |= {p for p in routes if any(p.startswith(v["path"] + "page/") for v in SECTIONS.values())}
+    extra = sorted(p for p in routes if p not in kept_paths and p not in EXISTING and p not in product_paths)
     report = {
         "kept": len(kept_paths),
         "generated_routes": len(routes),
         "missing_kept": missing,
+        "redirected_pagination": len(gone_pages),
         "extra_generated": extra,
         "primary_posts": len(primary_posts),
         "tags": len(tag_pages),
@@ -956,17 +1131,134 @@ def main():
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
-def generate_article(path, post, model, by_cat, routes):
+# ---------------------------------------------------------------------------
+# Cloudflare redirects (_redirects, read by Cloudflare Pages / Workers assets)
+# ---------------------------------------------------------------------------
+REDIRECT_FALLBACK = {
+    "tag": "/nhan-bao-gia/", "author": "/nhan-bao-gia/", "category": "/nhan-bao-gia/",
+    "bao-gia": "/bao-gia/", "product": "/san-pham/", "product-category": "/san-pham/",
+    "featured_item": "/category/du-an-cong-trinh/", "featured_item_category": "/category/du-an-cong-trinh/",
+}
+REDIRECT_SKIP = {"/xmlrpc.php", "/wp-login.php"}
+# old WooCommerce product slugs -> catalogue page, by keyword in the slug
+REDIRECT_PRODUCT_KW = [
+    ("vo-da", "/product/may-lam-cat-nhan-tao/"), ("may-nghien-cat", "/product/may-lam-cat-nhan-tao/"),
+    ("may-nghien-con", "/product/may-nghien-con/"), ("may-nghien-ham", "/san-pham/may-nghien-da/"),
+    ("may-kep-ham", "/san-pham/may-nghien-da/"), ("sang-rung", "/san-pham/sang-rung-phu-tung/"),
+    ("cap-lieu", "/san-pham/sang-rung-phu-tung/"), ("mclanahan", "/product/may-rua-cat/"),
+    ("may-tach-nuoc", "/san-pham/may-rua-cat/"),
+]
+
+
+def cf_path(path: str) -> str:
+    """Percent-encode a path the way browsers send it (UTF-8, NFC kept as given)."""
+    return urllib.parse.quote(path, safe="/%-._~!$&'()*+,;=:@")
+
+
+def write_redirects(rows, routes, extra=None):
+    import difflib
+    live = set(routes)
+    # page paths keep the old site's Unicode form (often NFD); match on NFC
+    live_nfc = {unicodedata.normalize("NFC", p): p for p in live}
+    by_seg = defaultdict(list)
+    for pth in live:
+        by_seg[pth.strip("/").split("/")[0] if pth.count("/") > 2 else ""].append(pth)
+
+    def norm(url: str) -> str:
+        pth = unicodedata.normalize("NFC", url_path(url.strip().rstrip(".")))
+        if not pth.endswith("/") and "." not in Path(pth).name:
+            pth += "/"
+        return pth
+
+    def canonical(t: str) -> str:
+        c = routes.get(t, {}).get("canonical")
+        return c if c in live else t
+
+    def target_for(path: str, merge: str, depth: int = 0) -> str:
+        return canonical(_target_for(path, merge, depth))
+
+    def _target_for(path: str, merge: str, depth: int = 0) -> str:
+        if merge:
+            t = norm(merge)
+            if t in live_nfc:
+                return live_nfc[t]
+            if depth < 3:
+                return _target_for(t, "", depth + 1)
+        if path in live_nfc and depth:
+            return live_nfc[path]
+        m = re.match(r"^(.*/)page/\d+/$", path)
+        if m and m.group(1) in live_nfc:
+            return live_nfc[m.group(1)]
+        if m:
+            path = m.group(1)
+        parts = path.strip("/").split("/")
+        seg = parts[0] if len(parts) > 1 else ""
+        # closest live page in the same section (old product/post slugs)
+        if seg == "product":
+            for kw, dest in REDIRECT_PRODUCT_KW:
+                if kw in parts[-1] and dest in live:
+                    return dest
+        if seg in ("product", ""):
+            pool = [p for p in by_seg[seg]] + ([p for p in by_seg["product"]] if seg == "" else [])
+            leaf = parts[-1]
+            prefix = [p for p in pool if leaf.startswith(p.strip("/").split("/")[-1] + "-")]
+            if prefix:
+                return max(prefix, key=len)
+            near = difflib.get_close_matches(path, pool, n=1, cutoff=0.75)
+            if near:
+                return near[0]
+        parent = "/" + "/".join(parts[:-1]) + "/" if len(parts) > 1 else "/"
+        if parent in live and parent != "/":
+            return parent
+        return REDIRECT_FALLBACK.get(seg or parts[0], "/")
+
+    lines, seen = [], set()
+    for url, status, kind, in_sitemap, rec, reason, merge in rows:
+        if rec != "Xoá":
+            continue
+        raw = urllib.parse.urlparse(url.strip().rstrip(".")).path or "/"
+        if not raw.endswith("/") and "." not in Path(raw).name:
+            raw += "/"
+        path = norm(url)
+        if path in REDIRECT_SKIP or raw in REDIRECT_SKIP:
+            continue
+        dest = cf_path(target_for(path, merge))
+        # the URL as the old site printed it, and as a browser would encode it
+        sources = {cf_path(raw), re.sub(r"%[0-9a-f]{2}", lambda m: m.group(0).upper(), cf_path(raw))}
+        for src in sorted(sources):
+            if src == dest or src in seen or urllib.parse.unquote(src) in live:
+                continue
+            seen.add(src)
+            lines.append(f"{src} {dest} 301")
+    # kept URLs that no longer exist after the restructure
+    for src_path, dest_path in sorted((extra or {}).items()):
+        src = cf_path(src_path)
+        if src not in seen:
+            seen.add(src)
+            lines.append(f"{src} {cf_path(dest_path)} 301")
+    # typed / NFC-encoded spelling of a page whose real path is NFD
+    for nfc, real in sorted(live_nfc.items()):
+        src = cf_path(nfc)
+        if nfc != real and src not in seen and nfc not in live:
+            seen.add(src)
+            lines.append(f"{src} {cf_path(real)} 301")
+    header = ("# Cloudflare redirects - generated by tools/build.py from urls.html (rows marked \"Xoá\").\n"
+              "# Do not edit by hand. Format: <from> <to> <status>\n")
+    (SITE / "_redirects").write_text(header + "\n".join(lines) + "\n", encoding="utf-8")
+    print(f"_redirects: {len(lines)} rules")
+
+
+def generate_article(path, post, model, by_section, routes):
     from_dir = page_dir(path)
     image_map = model["image_map"]
     body_html = sanitize(post["node"], from_dir=from_dir, model=model, image_map=image_map)
     if not body_html:
         body_html = f"<p>{esc(post['description'] or post['title'])}</p><p>Nội dung chi tiết đang được cập nhật. Quý khách cần tư vấn cấu hình, vui lòng gọi <a href=\"tel:0912712772\">0912 712 772</a>.</p>"
 
-    cat_slug = post["primary_cat"]
-    cat_name = CATEGORIES.get(cat_slug, {}).get("name", "Tin tức")
-    cat_link = f"/category/{cat_slug}/" if cat_slug in CATEGORIES else "/category/tin-tuc/"
-    cr = [("Trang chủ", "/"), (cat_name, cat_link), (post["title"], None)]
+    sec_key = post["section"]
+    sec = SECTIONS[sec_key]
+    cat_name, cat_link = sec["name"], sec["path"]
+    cr = [("Trang chủ", "/")] + section_crumbs(sec_key) + [(post["title"], None)]
 
     tags_html = ""
     if post["tags_data"]:
@@ -976,7 +1268,7 @@ def generate_article(path, post, model, by_cat, routes):
             tags_html = f'<div class="article__tags"><span>Chủ đề:</span>{chips}</div>'
 
     # related: three newest in the same primary category
-    related = [p for p in by_cat.get(cat_slug, []) if p["path"] != path][:3]
+    related = [p for p in by_section.get(sec_key, []) if p["path"] != path][:3]
     related_html = ""
     if related and post["is_primary"]:
         cards = "\n          ".join(post_card(p, from_dir) for p in related)
@@ -1036,16 +1328,55 @@ def generate_article(path, post, model, by_cat, routes):
     noindex = (not post["is_primary"]) or (not post["is_article"])
     page_title = post["title"] + " | Thế Giới Máy Nghiền Đá"
     write_page(path, page_shell(path=path, title=page_title, description=desc,
-                                canonical=canonical, body=body, nav="tin-tuc" if cat_slug != "du-an-cong-trinh" else "du-an",
+                                canonical=canonical, body=body, nav=MENU_BY_KEY[sec["parent"]][3],
                                 jsonld=jsonld, noindex=noindex, og_type="article",
                                 image=post["thumb"]))
+
+
+def load_catalog():
+    """Product cards from the hand-built /san-pham/ page, in page order."""
+    text = (SITE / "san-pham" / "index.html").read_text(encoding="utf-8")
+    soup = BeautifulSoup(text, "lxml")
+    out = []
+    for card in soup.select("article.product[data-group]"):
+        img_link = card.select_one(".product__img")
+        img = img_link.find("img")
+        learn = card.select_one(".product__acts .product__btn:not(.product__btn--fill)")
+        out.append({
+            "name": card.select_one(".h4").get_text(" ", strip=True),
+            "group": card["data-group"],
+            "spec": card.select_one(".product__txt p").get_text(" ", strip=True),
+            "image": img["src"].replace("../", "", 1),
+            "white": "product__img--white" in img_link.get("class", []),
+            "quote": "/" + card.select_one(".product__btn--fill")["href"].replace("../", "", 1),
+            "learn": "/" + learn["href"].replace("../", "", 1) if learn and learn["href"].startswith("../") else "/san-pham/",
+        })
+    return out
+
+
+def product_tile(product, from_dir: str) -> str:
+    """Same card as on /san-pham/: image -> quote form, 'Tìm hiểu' -> article."""
+    quote = esc(rel_url(from_dir, product["quote"].split("?")[0]) + ("?" + product["quote"].split("?", 1)[1] if "?" in product["quote"] else ""))
+    learn = esc(rel_url(from_dir, product["learn"]))
+    white = " product__img--white" if product["white"] else ""
+    return f"""<article class="product reveal">
+            <a class="product__img{white}" href="{quote}"><img src="{esc(rel_url(from_dir, product['image']))}" alt="{esc(product['name'])}" width="600" height="600" loading="lazy"></a>
+            <div class="product__txt">
+              <h2 class="h4">{esc(product['name'])}</h2>
+              <p>{esc(product['spec'])}</p>
+              <div class="product__acts">
+                <a class="product__btn product__btn--fill" href="{quote}">Báo giá</a>
+                <a class="product__btn" href="{learn}">Tìm hiểu</a>
+              </div>
+            </div>
+          </article>"""
 
 
 def generate_product(product, model):
     path = product["path"]
     from_dir = page_dir(path)
     body_html = sanitize(product["node"], from_dir=from_dir, model=model, image_map=model["image_map"])
-    cr = [("Trang chủ", "/"), ("Sản phẩm", "/san-pham/"), (product["title"], None)]
+    cr = [("Trang chủ", "/"), ("Thiết bị", "/san-pham/"), (product["title"], None)]
     body = f"""    <div class="page-title">
       <div class="container">
         <h1>{esc(product['title'])}</h1>
@@ -1072,6 +1403,147 @@ def generate_product(product, model):
     write_page(path, page_shell(path=path, title=f"{product['title']} | Thế Giới Máy Nghiền Đá",
                                 description=desc, canonical=BASE + path, body=body,
                                 nav="san-pham", jsonld=jsonld, image=model["image_map"].get(product.get("image", ""), "")))
+
+
+def capacity_block(from_dir: str) -> str:
+    """Capacity table + process steps, taken from /san-pham/ (#day-chuyen)."""
+    text = (SITE / "san-pham" / "index.html").read_text(encoding="utf-8")
+    m = re.search(r'<section class="section section--gray" id="day-chuyen">.*?<div class="container">(.*?)</div>\s*</section>', text, re.S)
+    if not m:
+        return ""
+    inner = re.sub(r'\s*<div class="section-title reveal">.*?</div>\s*<p class="section-lead reveal">.*?</p>', "", m.group(1), count=1, flags=re.S)
+    inner = re.sub(r'href="\.\./([^"]*)"', lambda x: f'href="{rel_url(from_dir, "/" + x.group(1))}"', inner)
+    return f"""<h2 class="block-title sec-block">Cấu hình theo công suất</h2>
+        {inner.strip()}"""
+
+
+# ---------------------------------------------------------------------------
+# sections (main menu)
+# ---------------------------------------------------------------------------
+def section_crumbs(key: str, current: bool = False):
+    """Breadcrumb items for a section: [menu group,] section."""
+    sec = SECTIONS[key]
+    _, label, landing, _ = MENU_BY_KEY[sec["parent"]]
+    items = [] if landing == sec["path"] else [(label, landing)]
+    return items + [(sec["name"], None if current else sec["path"])]
+
+
+def section_nav(parent: str, current: str | None, from_dir: str) -> str:
+    """Pills linking the sections of one menu group."""
+    links = [(v["name"], v["path"], k == current) for k, v in section_children(parent)]
+    if parent == "dich-vu":
+        links = [(n, pth, False) for n, pth in SERVICE_LINKS] + links
+    if len(links) < 2:
+        return ""
+    cur = ' aria-current="page"'
+    pills = "".join(f'<a href="{esc(rel_url(from_dir, pth))}"{cur if on else ""}>{esc(n)}</a>'
+                    for n, pth, on in links)
+    return f'<nav class="pcat-nav" aria-label="{esc(MENU_BY_KEY[parent][1])}">{pills}</nav>'
+
+
+def generate_section(key, members, total, model):
+    sec = SECTIONS[key]
+    base = sec["path"]
+    nav = MENU_BY_KEY[sec["parent"]][3]
+    catalog = {p["name"]: p for p in model["catalog"]}
+    for n in range(1, total + 1):
+        page_path = base if n == 1 else page_url(base, n)
+        from_dir = page_dir(page_path)
+        chunk = members[(n - 1) * PER_PAGE:n * PER_PAGE]
+        lead = ""
+        if n == 1:
+            lead = section_nav(sec["parent"], key, from_dir)
+            tiles = [product_tile(catalog[name], from_dir) for name in sec.get("products", []) if name in catalog]
+            if tiles:
+                lead += f"""
+        <h2 class="block-title sec-block">Thiết bị</h2>
+        <div class="products">
+          {"".join(tiles)}
+        </div>"""
+            if sec.get("capacity"):
+                lead += "\n        " + capacity_block(from_dir)
+            if members and (tiles or sec.get("capacity")):
+                lead += '\n        <h2 class="block-title sec-block">Bài viết</h2>'
+        cr = [("Trang chủ", "/")] + section_crumbs(key, current=n == 1)
+        if n > 1:
+            cr.append((f"Trang {n}", None))
+        title = sec["name"] if n == 1 else f"{sec['name']} – Trang {n}"
+        write_page(page_path, archive_page(
+            base_path=base, page_no=n, total_pages=total, h1=title,
+            intro=esc(sec["intro"]) if n == 1 else f"Tiếp tục danh sách {esc(sec['name'].lower())} – trang {n}/{total}.",
+            posts=chunk, from_dir=from_dir, crumbs_items=cr,
+            canonical=BASE + page_path, title=title + " | Thế Giới Máy Nghiền Đá",
+            description=sec["intro"], nav=nav, noindex=n > 1,
+            lead_html=lead, hide_empty=bool(lead)))
+
+
+def generate_solutions_landing(section_pages):
+    path = "/giai-phap/"
+    from_dir = page_dir(path)
+    boxes = []
+    for key, sec in section_children("giai-phap"):
+        count = len(section_pages[key][0])
+        boxes.append(f"""<a class="line-box reveal" href="{esc(rel_url(from_dir, sec['path']))}">
+            <h3>{esc(sec['name'])}</h3>
+            <p>{esc(sec['intro'])}</p>
+            <span class="line-box__more">Xem giải pháp · {count} bài viết<svg class="ico ico--sm"><use href="#i-right"/></svg></span>
+          </a>""")
+    cr = [("Trang chủ", "/"), ("Giải pháp", None)]
+    intro = "Chọn dây chuyền theo sản phẩm bạn cần làm ra: đá xây dựng, cát nhân tạo, cát rửa sạch, quặng tinh hay cốt liệu tái chế. Cấu hình cuối cùng được kỹ sư chốt sau khi khảo sát mỏ."
+    body = f"""    <div class="page-title">
+      <div class="container">
+        <h1>Giải pháp</h1>
+        {crumbs(cr, from_dir)}
+      </div>
+    </div>
+    <section class="section">
+      <div class="container">
+        <p class="intro reveal">{esc(intro)}</p>
+        <div class="lines lines--page">
+          {"".join(boxes)}
+        </div>
+      </div>
+    </section>
+    <section class="section section--gray">
+      <div class="container">
+        {capacity_block(from_dir)}
+      </div>
+    </section>
+{cta_band(from_dir)}"""
+    jsonld = [
+        {"@context": "https://schema.org", "@type": "BreadcrumbList",
+         "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Trang chủ", "item": BASE + "/"},
+                             {"@type": "ListItem", "position": 2, "name": "Giải pháp", "item": BASE + path}]},
+        {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Giải pháp dây chuyền nghiền sàng",
+         "url": BASE + path, "description": intro},
+    ]
+    write_page(path, page_shell(path=path, title="Giải pháp dây chuyền nghiền đá, cát nhân tạo | Thế Giới Máy Nghiền Đá",
+                                description=intro, canonical=BASE + path, body=body, nav="giai-phap", jsonld=jsonld))
+
+
+def remove_stale_pages(routes):
+    """Delete generated pages that no longer have a route (STALE_DRY=1 only lists them)."""
+    live = {unicodedata.normalize("NFC", output_path(p)) for p in routes}
+    removed = 0
+    dry = os.environ.get("STALE_DRY") == "1"
+    for f in sorted(SITE.rglob("index.html"), reverse=True):
+        parts = f.relative_to(SITE).parts
+        if parts[0] in ("assets",) or parts[0].startswith("."):
+            continue
+        rel = unicodedata.normalize("NFC", f.relative_to(SITE).as_posix())
+        if rel not in live:
+            if dry:
+                print("  sẽ xoá:", rel)
+                removed += 1
+                continue
+            f.unlink()
+            removed += 1
+            d = f.parent
+            while d != SITE and not any(d.iterdir()):
+                d.rmdir()
+                d = d.parent
+    if removed:
+        print(f"{'sẽ xoá' if dry else 'đã xoá'} {removed} trang cũ không còn dùng")
 
 
 def generate_featured(model, image_map):
@@ -1106,6 +1578,8 @@ def generate_featured(model, image_map):
 
     items = [i for i in model["featured"] if not i["path"].startswith("/featured_item_category/")]
     path = "/featured_item/"
+    if path not in model["kept_paths"]:
+        return
     from_dir = page_dir(path)
     cards = "\n          ".join(post_card({**i, "dt": None, "primary_cat": "du-an-cong-trinh",
                                           "thumb": image_map.get(i.get("image", ""), "")}, from_dir, meta="Dự án")
@@ -1131,6 +1605,8 @@ def generate_featured(model, image_map):
 
     for slug, name in FEATURED_CATEGORIES.items():
         path = f"/featured_item_category/{slug}/"
+        if path not in model["kept_paths"]:
+            continue
         from_dir = page_dir(path)
         members = [i for i in items if i["path"].rstrip("/").split("/")[-1] in FEATURED_MEMBERS[slug]]
         cards = "\n          ".join(post_card({**i, "dt": None, "primary_cat": "du-an-cong-trinh",

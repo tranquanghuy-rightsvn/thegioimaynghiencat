@@ -24,7 +24,7 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "tools" / "data" / "raw.pkl"
 CACHE = ROOT / "tools" / "cache" / "img"
-OUT = ROOT / "assets" / "img" / "content"
+OUT = ROOT / "html" / "assets" / "img" / "content"
 MAP = ROOT / "tools" / "data" / "images.json"
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"
 LOCAL_HOSTS = {"thegioimaynghienda.com", "www.thegioimaynghienda.com"}

@@ -12,7 +12,7 @@ Cách dùng:  python3 tools/sync-layout.py
 import re
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent / "html"  # website folder
 BLOCKS = ("header", "footer")
 # Chỉ sửa đường dẫn tương đối: bỏ qua link tuyệt đối, giao thức, neo trong trang, data URL.
 URL_ATTR = re.compile(r'(\s(?:href|src))="(?!https?:|//|#|tel:|mailto:|data:|/)([^"]*)"')

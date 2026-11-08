@@ -1,8 +1,9 @@
 {
-  "kept": 1139,
-  "generated_routes": 1142,
+  "kept": 1090,
+  "generated_routes": 1094,
   "missing_kept": [],
+  "redirected_pagination": 23,
   "extra_generated": [],
   "primary_posts": 242,
-  "tags": 711
+  "tags": 708
 }
