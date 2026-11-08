@@ -38,7 +38,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261108l"
+CSS_VER = "20261108n"
 JS_VER = "20261103b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
@@ -152,6 +152,25 @@ SECTIONS = {
                     "intro": "Cát nhân tạo là gì, tiêu chuẩn cát nghiền, so sánh cát nhân tạo và cát tự nhiên, ứng dụng trong bê tông, cầu đường và gạch không nung."},
     "kt-thi-truong": {"parent": "kien-thuc", "name": "Thị trường & giá", "path": "/kien-thuc/thi-truong-gia/",
                       "intro": "Giá đá, giá cát xây dựng, thị trường vật liệu theo từng tỉnh và nhu cầu vật liệu cho các dự án cao tốc, sân bay."},
+}
+# Process diagram for solution pages (stage, typical equipment). The stone line
+# uses the capacity table + steps already on /san-pham/.
+SECTION_FLOWS = {
+    "gp-cat-nhan-tao": [("Cấp liệu", "Cấp liệu rung"), ("Nghiền thô", "Máy nghiền hàm"), ("Nghiền trung", "Máy nghiền côn"),
+                        ("Làm cát", "Máy VSI"), ("Sàng phân loại", "Sàng rung"), ("Rửa cát", "Guồng / trục vít"),
+                        ("Thu hồi cát mịn", "Máy tách cát mịn")],
+    "gp-rua-cat": [("Cấp liệu", "Phễu, băng tải"), ("Sàng, xịt rửa", "Sàng rung có vòi phun"), ("Rửa cát", "Guồng / trục vít"),
+                   ("Tách nước", "Sàng rung tách nước"), ("Thu hồi cát mịn", "Máy tách cát mịn"), ("Xử lý nước, bùn", "Bể lắng, máy ép bùn")],
+    "gp-tuyen-quang": [("Nghiền thô", "Máy nghiền hàm"), ("Nghiền trung", "Máy nghiền côn"), ("Nghiền mịn", "Máy nghiền bi"),
+                       ("Phân cấp", "Thiết bị phân cấp"), ("Tuyển từ", "Máy tuyển từ"), ("Quặng tinh", "Tách nước, lưu kho")],
+    "gp-tai-che": [("Phân loại phế thải", "Loại bỏ tạp chất"), ("Nghiền", "Trạm nghiền di động"), ("Tách sắt thép", "Máy tách từ"),
+                   ("Sàng phân loại", "Sàng rung"), ("Cốt liệu tái chế", "Theo cỡ hạt yêu cầu")],
+}
+# which completed projects (section "du-an") illustrate a section: words in the project title
+SECTION_PROJECT_KW = {
+    "tb-nghien-da": ["nghiền đá", "đá"], "gp-nghien-da": ["nghiền đá", "đá"], "tb-di-dong": ["nghiền đá"],
+    "tb-lam-cat": ["cát", "0x4"], "gp-cat-nhan-tao": ["cát", "0x4"], "tb-rua-cat": ["rửa cát"], "gp-rua-cat": ["rửa cát"],
+    "tb-tuyen-quang": ["quặng"], "gp-tuyen-quang": ["quặng"], "tb-sang-phu-tung": ["nghiền đá"],
 }
 SECTION_BY_PATH = {v["path"]: k for k, v in SECTIONS.items()}
 # Dịch vụ menu also has the hand-built service page
@@ -1484,6 +1503,7 @@ def main():
     write_redirects(rows, routes, gone_pages)
     remove_stale_pages(routes)
     normalize_existing_heads()
+    link_catalog_cards()
     generate_404()
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
@@ -1891,9 +1911,9 @@ def product_tile(product, from_dir: str) -> str:
     learn = esc(rel_url(from_dir, product["learn"]))
     white = " product__img--white" if product["white"] else ""
     return f"""<article class="product reveal">
-            <a class="product__img{white}" href="{quote}"><img src="{esc(rel_url(from_dir, product['image']))}" alt="{esc(product['name'])}" width="600" height="600" loading="lazy"></a>
+            <a class="product__img{white}" href="{learn}"><img src="{esc(rel_url(from_dir, product['image']))}" alt="{esc(product['name'])}" width="600" height="600" loading="lazy"></a>
             <div class="product__txt">
-              <h2 class="h4">{esc(product['name'])}</h2>
+              <h2 class="h4"><a href="{learn}">{esc(product['name'])}</a></h2>
               <p>{esc(product['spec'])}</p>
               <div class="product__acts">
                 <a class="product__btn product__btn--fill" href="{quote}">Báo giá</a>
@@ -1972,6 +1992,61 @@ def section_nav(parent: str, current: str | None, from_dir: str) -> str:
     return f'<nav class="pcat-nav" aria-label="{esc(MENU_BY_KEY[parent][1])}">{pills}</nav>'
 
 
+def flow_block(key: str) -> str:
+    flow = SECTION_FLOWS.get(key)
+    if not flow:
+        return ""
+    items = "".join(f"<li><span>{i}</span>{esc(a)}<small>{esc(b)}</small></li>" for i, (a, b) in enumerate(flow, 1))
+    return f"""
+        <h2 class="block-title sec-block">Quy trình công nghệ</h2>
+        <ol class="steps reveal">{items}</ol>"""
+
+
+def section_videos(members, limit=3) -> list:
+    """Company YouTube videos embedded in the section's own articles (newest first)."""
+    seen, out = set(), []
+    for p in members:
+        node = p.get("node")
+        if node is None:
+            continue
+        for fr in node.find_all("iframe"):
+            m = re.search(r"youtube(?:-nocookie)?\.com/embed/([\w-]{11})", fr.get("src", "") or fr.get("data-src", ""))
+            if m and m.group(1) not in seen:
+                seen.add(m.group(1))
+                out.append((m.group(1), clean(fr.get("title")) or p["title"], p))
+            if len(out) >= limit:
+                return out
+    return out
+
+
+def video_block(members, from_dir: str) -> str:
+    vids = section_videos(members)
+    if not vids:
+        return ""
+    cards = "".join(f"""<figure class="vid reveal"><div class="vid__frame"><iframe src="https://www.youtube-nocookie.com/embed/{vid}" title="{esc(title)}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+            <figcaption>{esc(title)} · <a href="{esc(rel_url(from_dir, p['path']))}">Xem bài viết</a></figcaption></figure>""" for vid, title, p in vids)
+    return f"""
+        <h2 class="block-title sec-block">Video thực tế</h2>
+        <div class="vids">{cards}</div>"""
+
+
+def project_block(key: str, model, from_dir: str) -> str:
+    kws = SECTION_PROJECT_KW.get(key)
+    if not kws:
+        return ""
+    projects = [p for p in model["primary_posts"] if p["section"] == "du-an"
+                and any(k in p["title"].lower() for k in kws)][:3]
+    if not projects:
+        return ""
+    cards = "\n          ".join(post_card(p, from_dir, meta="Dự án") for p in projects)
+    return f"""
+        <h2 class="block-title sec-block">Dự án đã triển khai</h2>
+        <div class="posts posts--3">
+          {cards}
+        </div>
+        <p class="sec-more"><a class="button button--outline" href="{esc(rel_url(from_dir, SECTIONS['du-an']['path']))}">Xem tất cả dự án</a></p>"""
+
+
 def generate_section(key, members, total, model):
     sec = SECTIONS[key]
     base = sec["path"]
@@ -1993,7 +2068,10 @@ def generate_section(key, members, total, model):
         </div>"""
             if sec.get("capacity"):
                 lead += "\n        " + capacity_block(from_dir)
-            if members and (tiles or sec.get("capacity")):
+            lead += flow_block(key)
+            lead += video_block(members, from_dir)
+            lead += project_block(key, model, from_dir)
+            if members and lead.strip():
                 lead += '\n        <h2 class="block-title sec-block">Bài viết</h2>'
         cr = [("Trang chủ", "/")] + section_crumbs(key, current=n == 1)
         if n > 1:
@@ -2086,6 +2164,42 @@ def normalize_existing_heads():
                     "publisher": {"@type": "Organization", "name": "Thanh Long JSC", "url": BASE + "/"}}
             head += '  <script type="application/ld+json">\n' + json.dumps(site, ensure_ascii=False, indent=2) + "\n</script>\n"
         f.write_text(add_tracking(head + "</head>" + rest), encoding="utf-8")
+
+
+def machine_page(name: str):
+    """Menu page that presents a machine: its Thiết bị group, else its Giải pháp line."""
+    for parent in ("thiet-bi", "giai-phap"):
+        for _, sec in section_children(parent):
+            if name in sec.get("products", []):
+                return sec["path"]
+    return None
+
+
+def link_catalog_cards():
+    """Home page and /san-pham/: a machine's image and name open its group page
+    (they used to jump to the quote form). The quote buttons are left as they are."""
+    for path, rel in (("/", "index.html"), ("/san-pham/", "san-pham/index.html")):
+        f = SITE / rel
+        h = f.read_text(encoding="utf-8")
+        from_dir = page_dir(path)
+
+        def fix(m):
+            card = m.group(0)
+            t = re.search(r'<(h4|h2 class="h4")>(?:<a href="[^"]*">)?(.*?)(?:</a>)?</h[24]>', card, re.S)
+            if not t:
+                return card
+            name = html.unescape(re.sub(r"<[^>]+>", "", t.group(2))).strip()
+            target = machine_page(name)
+            if not target:
+                return card
+            href = esc(rel_url(from_dir, target))
+            tag = t.group(1).split()[0]
+            card = card[:t.start()] + f'<{t.group(1)}><a href="{href}">{t.group(2) if "<a" not in t.group(2) else name}</a></{tag}>' + card[t.end():]
+            return re.sub(r'(<a class="product__img[^"]*") href="[^"]*"(?: data-pick="[^"]*")?', rf'\1 href="{href}"', card, count=1)
+
+        new = re.sub(r'<article class="product reveal"[^>]*>.*?</article>', fix, h, flags=re.S)
+        if new != h:
+            f.write_text(new, encoding="utf-8")
 
 
 def generate_404():

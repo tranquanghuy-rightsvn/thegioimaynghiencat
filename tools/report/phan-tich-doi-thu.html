@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Phân tích đối thủ – thegioimaynghienda.com</title>
+<style>
+  @page { size: A4; margin: 12mm 13mm 13mm; }
+  :root { --blue: #0059b1; --blue2: #037ce7; --light: #e8f4fd; --ink: #1d2433; --muted: #5d6675; --line: #dfe4ea; --green: #15803d; --red: #b91c1c; --amber: #b45309; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 10.5pt/1.55 "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--ink); }
+  h1 { font-size: 22pt; line-height: 1.2; margin: 0 0 6px; color: var(--blue); }
+  h2 { font-size: 14pt; margin: 22px 0 8px; padding-bottom: 5px; border-bottom: 2px solid var(--blue); color: var(--blue); break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 14px 0 5px; color: var(--ink); break-after: avoid; }
+  p { margin: 0 0 7px; }
+  ul { margin: 0 0 8px; padding-left: 18px; } li { margin-bottom: 3px; }
+  b { color: #0b1b33; }
+  code { font: 9pt Menlo, Consolas, monospace; background: #f1f4f8; padding: 0 3px; border-radius: 2px; }
+  .muted { color: var(--muted); }
+  .cover { padding: 26px 26px 20px; background: linear-gradient(135deg, #00337a, #0059b1 60%, #037ce7); color: #fff; border-radius: 6px; margin-bottom: 16px; }
+  .cover h1 { color: #fff; }
+  .cover .sub { font-size: 11.5pt; opacity: .92; }
+  .cover .meta { margin-top: 14px; font-size: 9.5pt; opacity: .85; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 6px; }
+  .kpi { border: 1px solid var(--line); border-top: 3px solid var(--blue2); border-radius: 4px; padding: 8px 10px; break-inside: avoid; }
+  .kpi b { display: block; font-size: 17pt; line-height: 1.1; color: var(--blue); }
+  .kpi span { font-size: 8.8pt; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9.5pt; break-inside: auto; }
+  th, td { border: 1px solid var(--line); padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: var(--light); color: #0b2d5c; font-weight: 700; }
+  tr { break-inside: avoid; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .before { color: var(--red); } .after { color: var(--green); font-weight: 700; }
+  .note { border-left: 4px solid var(--blue2); background: var(--light); padding: 8px 11px; margin: 8px 0 10px; break-inside: avoid; }
+  .warn { border-left-color: var(--amber); background: #fff7ed; }
+  .alert { border-left-color: var(--red); background: #fef2f2; }
+  .tree { font: 9.2pt/1.45 Menlo, Consolas, monospace; background: #f7f9fc; border: 1px solid var(--line); border-radius: 4px; padding: 9px 12px; white-space: pre; break-inside: avoid; }
+  .tag { display: inline-block; padding: 0 6px; border-radius: 3px; font-size: 8.5pt; font-weight: 700; }
+  .t-done { background: #dcfce7; color: var(--green); } .t-next { background: #fef3c7; color: var(--amber); }
+  .page-break { break-before: page; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  footer { margin-top: 18px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 8.5pt; color: var(--muted); }
+.keep { break-inside: avoid; }
+</style>
+
+</head>
+<body>
+
+<div class="cover">
+  <h1>Phân tích đối thủ &amp; kế hoạch triển khai<br>Website thegioimaynghienda.com</h1>
+  <div class="sub">Kiểm chứng 4 website đối thủ, đối chiếu website mới của Thanh Long theo từng tiêu chí, các hạng mục đã thực hiện và dữ liệu cần doanh nghiệp cung cấp</div>
+  <div class="meta">Khách hàng: Thanh Long JSC · Ngày lập: 08/11/2026 · Đối thủ: Minh Huy, Đại Việt JSC, Thiết Bị Hòa Phát, Đại Phú Ninh Bình</div>
+</div>
+
+<h2>1. Tóm tắt</h2>
+<div class="kpis">
+  <div class="kpi"><b>4/4</b><span>nhận định về đối thủ được kiểm chứng trực tiếp trên website của họ</span></div>
+  <div class="kpi"><b>3</b><span>hạng mục đã triển khai ngay trên website (VIỆC 1, 3 và một phần VIỆC 4)</span></div>
+  <div class="kpi"><b>3</b><span>hạng mục cần dữ liệu thật từ Thanh Long (VIỆC 2, 4, 5)</span></div>
+  <div class="kpi"><b>1</b><span>quyết định cần chủ doanh nghiệp: phân vai Labcare – Thế Giới Máy Nghiền Đá (VIỆC 6)</span></div>
+</div>
+<div class="note">Đánh giá đối thủ dựa trên nội dung và cấu trúc quan sát được ngày 08/11/2026; không có dữ liệu traffic, thứ hạng cố định hay tỷ lệ ra khách của họ. Muốn biết chính xác "ai đang Top mấy" cần đo cùng một bộ từ khoá, cùng địa điểm và thiết bị (xem mục 6).</div>
+
+<h2>2. Kiểm chứng từng đối thủ</h2>
+<table>
+  <tr><th style="width:15%">Đối thủ</th><th style="width:43%">Điều quan sát được (08/11/2026)</th><th>Thanh Long hiện tại – theo tiêu chí kiểm tra</th></tr>
+  <tr><td><b>Minh Huy</b><br><span class="muted">thietbicokhiminhhuy.com</span></td>
+      <td>Menu Sản phẩm chia sát từng loại máy: hàm PEW, côn, búa, sàng rung, cấp liệu, VSI, rửa cát guồng / trục vít, sàng tách nước, thu hồi cát mịn, cả linh kiện (con lăn, băng tải). Có Dự án – Công trình, Tư vấn kỹ thuật, Nhận báo giá. Trang sản phẩm đặt <b>giá (566 triệu), bảo hành 24 tháng, hotline</b> ngay đầu trang; có dữ liệu cấu trúc Product.</td>
+      <td><b>Trước:</b> bấm ảnh hoặc tên máy ở trang chủ / trang Thiết bị đều <span class="before">nhảy xuống form báo giá</span>.<br><b>Nay:</b> <span class="after">ảnh và tên máy mở đúng trang</span> (trang nhóm máy → bài giới thiệu máy), nút Báo giá vẫn mở form có điền sẵn tên máy.<br><b>Còn thiếu:</b> trang model có thông số, giá, bảo hành (cần dữ liệu).</td></tr>
+  <tr><td><b>Đại Việt JSC</b><br><span class="muted">daivietjsc.com.vn</span></td>
+      <td>Menu "Lĩnh vực" chia <b>theo công suất</b> (150, 200, 250, 500 tấn/giờ), dưới mỗi mức là model máy (cấp liệu ZSW, hàm CJ, côn CCH…). Trang giải pháp mở đầu bằng "Từ bài toán thực tế đến cấu hình phù hợp": rủi ro chọn sai cấu hình, công suất thực tế không đạt; cấu hình theo đá mềm / đá cứng / đá – cát.</td>
+      <td>Đã có trang "Dây chuyền nghiền đá xây dựng" kèm bảng 3 mức công suất (100–150 / 200–300 / &gt;350 tấn/giờ) và quy trình 6 bước; có các bài thật về trạm 150, 300, 350 tấn/giờ và chạy thử 500 tấn/giờ.<br><b>Còn thiếu:</b> trang riêng cho 350 / 500 / 650–700 tấn/giờ theo dữ liệu thật (cần dữ liệu – mục 4).</td></tr>
+  <tr><td><b>Thiết Bị Hòa Phát</b><br><span class="muted">thietbihoaphat.com</span></td>
+      <td>Menu chia dòng máy (VSI, VSI5X, VSI6X, rửa cát XSD…) và trạm theo công suất (50–400 tấn). Trang "Trạm nghiền cát nhân tạo" khoảng 4.300 từ, <b>8 video</b>, thành phần thiết bị, quy trình, cấu hình theo vật liệu, sai lầm thường gặp, chi phí đầu tư, hỏi đáp; dữ liệu cấu trúc Product.</td>
+      <td>Đã có tách "Thiết bị (nhóm máy) – Giải pháp (dây chuyền)".<br><b>Nay:</b> mỗi trang Giải pháp có <span class="after">sơ đồ quy trình công nghệ, 3 video thực tế của Thanh Long và dự án đã triển khai</span>.<br><b>Còn thiếu:</b> hỏi đáp và phần "cấu hình theo vật liệu" viết từ kinh nghiệm của kỹ sư Thanh Long.</td></tr>
+  <tr><td><b>Đại Phú Ninh Bình</b><br><span class="muted">daiphuninhbinh.com.vn</span></td>
+      <td>Bài "Báo giá trọn bộ dây chuyền máy nghiền đá xây dựng" giải thích từng thiết bị; menu có phụ tùng (vòng bi, động cơ, hộp giảm tốc, nhông xích); công bố năng lực bằng số: <b>25+ năm hoạt động, 1.500+ khách hàng, 3 nhà xưởng</b>; mục "Dự án và khách hàng".</td>
+      <td>Có mục Dự án với 7 công trình thật (bàn giao Bình Thuận, Yên Bái, Bình Phước, Hà Nam, chạy thử 500 tấn/giờ…), nay hiển thị ngay trên trang nhóm máy và giải pháp liên quan.<br><b>Còn thiếu:</b> hồ sơ trung tâm bảo hành, kho phụ tùng, đội lắp đặt; số liệu năng lực có bằng chứng (cần dữ liệu – mục 4).</td></tr>
+</table>
+
+<h2>3. Tình trạng 6 việc được giao</h2>
+<table>
+  <tr><th style="width:24%">Việc</th><th style="width:38%">Đã thực hiện</th><th>Còn lại</th></tr>
+  <tr><td><b>VIỆC 1</b> – Trang nhóm máy và model</td><td><span class="tag t-done">Đã làm</span> 6 trang nhóm máy (<code>/san-pham/may-nghien-da/</code>…), mỗi trang có thiết bị, bài viết, video, dự án và báo giá. Ảnh và tên máy ở trang chủ, trang Thiết bị, trang nhóm mở đúng trang thay vì form.</td><td><span class="tag t-next">Cần dữ liệu</span> Trang model (vd. máy hàm 600×900, côn SC350/SC650, VSI 110–150 kW): thông số, giá hoặc khoảng giá, bảo hành, ảnh thật.</td></tr>
+  <tr><td><b>VIỆC 2</b> – Giải pháp theo công suất và bài toán đầu tư</td><td>Đã có trang dây chuyền nghiền đá với bảng 3 mức công suất và quy trình; 5 trang giải pháp theo sản phẩm đầu ra.</td><td><span class="tag t-next">Cần dữ liệu</span> Trang 350 / 500 / 650–700 tấn/giờ: loại đá → cấu hình → thành phẩm → chi phí vận hành → công trình chứng minh → tư vấn. Mỗi trang phải khác nhau thực chất, không chỉ đổi con số.</td></tr>
+  <tr><td><b>VIỆC 3</b> – Sơ đồ công nghệ, video, hỏi đáp</td><td><span class="tag t-done">Đã làm</span> Sơ đồ quy trình trên 5 trang giải pháp; khối "Video thực tế" (video YouTube của Thanh Long lấy từ chính các bài trong chuyên mục) trên 16 trang chuyên mục.</td><td><span class="tag t-next">Cần dữ liệu</span> Hỏi đáp cho từng dây chuyền (câu trả lời từ kỹ sư), video nguyên lý / mô phỏng nếu có.</td></tr>
+  <tr><td><b>VIỆC 4</b> – Hồ sơ công trình, bảo hành, phụ tùng</td><td><span class="tag t-done">Một phần</span> Mục Dự án chỉ gồm công trình thật; khối "Dự án đã triển khai" trên trang thiết bị / giải pháp liên quan.</td><td><span class="tag t-next">Cần dữ liệu</span> Hồ sơ từng công trình, trung tâm bảo hành, kho phụ tùng, đội lắp đặt (mục 4).</td></tr>
+  <tr><td><b>VIỆC 5</b> – Lợi thế bằng dữ liệu vận hành</td><td>—</td><td><span class="tag t-next">Cần dữ liệu</span> Công suất vận hành, điện năng, hao mòn, tỷ lệ thành phẩm, thời gian dừng máy, ghi rõ điều kiện đo (mục 4).</td></tr>
+  <tr><td><b>VIỆC 6</b> – Giữ URL có tìm kiếm; phân vai Labcare</td><td><span class="tag t-done">Đã làm</span> Toàn bộ URL đang có lượt tìm kiếm giữ nguyên hoặc 301 đúng như website cũ (đối chiếu Search Console 16 tháng); nội dung được nâng ngay trên trang cũ.</td><td><span class="tag t-next">Cần quyết định</span> Phân vai Labcare – Thế Giới Máy Nghiền Đá trước khi chuyển hoặc viết lại bài (mục 5).</td></tr>
+</table>
+
+<h2>4. Dữ liệu cần Thanh Long cung cấp</h2>
+<p>Website chỉ đăng thông tin có thật; các phần dưới đây là điều kiện để làm VIỆC 1, 2, 4, 5. Có thể gửi theo từng đợt, ưu tiên theo thứ tự.</p>
+<h3>4.1. Model thiết bị (VIỆC 1)</h3>
+<ul>
+  <li>Danh sách model đang bán theo nhóm: máy nghiền hàm, côn, phản kích, búa, VSI, máy rửa cát, tách cát mịn, ép bùn, sàng rung, cấp liệu, trạm di động, máy nghiền bi.</li>
+  <li>Mỗi model: thông số chính (cỡ cấp liệu, cửa xả, năng suất, công suất động cơ, khối lượng), xuất xứ / hãng, bảo hành, giá hoặc khoảng giá được phép công bố, 3–5 ảnh thật, catalogue PDF nếu có.</li>
+</ul>
+<div class="keep"><h3>4.2. Dây chuyền theo công suất (VIỆC 2)</h3>
+<table>
+  <tr><th>Trường thông tin</th><th>Ví dụ cần có cho mỗi mức 350 / 500 / 650–700 tấn/giờ</th></tr>
+  <tr><td>Điều kiện đầu vào</td><td>Loại đá (granite, bazan, đá vôi…), cỡ đá đầu vào, độ ẩm, tỷ lệ đất</td></tr>
+  <tr><td>Cấu hình</td><td>Danh sách thiết bị và model theo thứ tự công đoạn, sơ đồ bố trí</td></tr>
+  <tr><td>Thành phẩm</td><td>Các cỡ sản phẩm và tỷ lệ (vd. đá 1x2, 0x4, cát nghiền)</td></tr>
+  <tr><td>Chi phí vận hành</td><td>Điện năng kWh/tấn, vật tư hao mòn, nhân công vận hành</td></tr>
+  <tr><td>Công trình chứng minh</td><td>Trạm đã bàn giao cùng mức công suất: địa điểm, thời gian lắp đặt, ảnh / video</td></tr>
+</table></div>
+<h3>4.3. Hồ sơ năng lực có bằng chứng (VIỆC 4)</h3>
+<ul>
+  <li><b>Từng công trình:</b> địa điểm (tỉnh), công suất, thiết bị, thời gian lắp đặt, ảnh / video, kết quả vận hành, xác nhận khách hàng đồng ý công bố.</li>
+  <li><b>Trung tâm bảo hành</b> (AH 51, Long Hương): ảnh, quy trình tiếp nhận, thời gian phản hồi cam kết.</li>
+  <li><b>Kho phụ tùng:</b> nhóm phụ tùng thường có sẵn (má hàm, nón côn, búa VSI, lưới sàng, vòng bi SKF…), ảnh kho.</li>
+  <li><b>Đội lắp đặt:</b> số kỹ sư / thợ, chứng chỉ, số trạm đã lắp; số năm hoạt động, số khách hàng nếu công bố được.</li>
+</ul>
+<div class="keep"><h3>4.4. Dữ liệu vận hành tạo lợi thế riêng (VIỆC 5)</h3>
+<table>
+  <tr><th>Chỉ số</th><th>Đơn vị gợi ý</th><th>Ghi kèm điều kiện đo</th></tr>
+  <tr><td>Công suất vận hành thực tế</td><td>tấn/giờ</td><td rowspan="5">Loại đá, cỡ đầu vào, cấu hình trạm, thời gian theo dõi, nguồn số liệu (nhật ký trạm, đồng hồ điện…)</td></tr>
+  <tr><td>Điện năng tiêu thụ</td><td>kWh/tấn</td></tr>
+  <tr><td>Hao mòn vật tư</td><td>g/tấn hoặc giờ chạy/bộ má, búa, nón</td></tr>
+  <tr><td>Tỷ lệ thành phẩm</td><td>% theo từng cỡ sản phẩm</td></tr>
+  <tr><td>Thời gian dừng máy</td><td>giờ/tháng, nguyên nhân</td></tr>
+</table></div>
+
+<h2>5. Phân vai Labcare – Thế Giới Máy Nghiền Đá (VIỆC 6)</h2>
+<p>Kiểm tra cho thấy <code>labcare.com.vn</code> cũng có bài về báo giá và máy nghiền đá (vd. "Báo giá máy nghiền đá – giải pháp cho doanh nghiệp xây dựng", đang hoạt động ngày 08/11/2026). Website cũ còn 1.383 liên kết trỏ sang Labcare (đã chuyển về trang nội bộ trên website mới). Hai website cùng viết một chủ đề sẽ tự tranh thứ hạng với nhau.</p>
+<div class="note"><b>Đề xuất:</b> <b>thegioimaynghienda.com</b> là website bán hàng chính cho máy nghiền, máy làm cát, rửa cát và dây chuyền (Thiết bị, Giải pháp, Dự án, Kiến thức). <b>labcare.com.vn</b> tập trung vào thế mạnh riêng của thương hiệu (cơ – điện – phần mềm, dịch vụ kỹ thuật, phụ tùng) và liên kết sang website chính cho chủ đề máy nghiền.<br>
+<b>Cách làm an toàn:</b> (1) xuất danh sách URL của Labcare có lượt tìm kiếm từ Search Console của Labcare; (2) với bài trùng chủ đề, giữ bài nào đang có thứ hạng tốt hơn, bài còn lại hợp nhất nội dung và 301 sang; (3) không chuyển hay viết lại bài khi chưa có số liệu.</div>
+<p><b>Cần chủ doanh nghiệp quyết định</b> vai trò của Labcare và cấp quyền xem Search Console của labcare.com.vn để lập danh sách cụ thể.</p>
+
+<h2>6. Đo kết quả</h2>
+<p>Đánh giá ở mốc 4 tuần và 12 tuần sau khi website mới hoạt động, và sau mỗi đợt bổ sung nội dung ở mục 4, theo ba nhóm chỉ số:</p>
+<ul>
+  <li><b>Thứ hạng theo từng từ khoá</b>, đo cố định cùng địa điểm (Việt Nam), cùng thiết bị (máy tính và di động), mỗi tuần. Bộ từ khoá đề xuất: máy nghiền đá, máy nghiền cát, máy làm cát nhân tạo, máy nghiền cát VSI, trạm nghiền đá, dây chuyền nghiền đá, trạm nghiền cát nhân tạo, máy rửa cát, máy nghiền hàm, máy nghiền côn, giá máy nghiền đá 1x2, dây chuyền nghiền đá 350 tấn, 500 tấn; kèm 4 tên miền đối thủ để so sánh cùng điều kiện.</li>
+  <li><b>Lượt click theo từng trang</b> trong Search Console (website mới giữ nguyên mã xác minh nên dữ liệu liên tục).</li>
+  <li><b>Số yêu cầu đủ thông tin</b> (có loại đá, công suất, sản phẩm đầu ra, số điện thoại): cấu hình trong Google Tag Manager (đã giữ nguyên <code>GTM-M3XKBSNK</code>) các sự kiện gửi form báo giá, bấm gọi điện, bấm Zalo, và đánh dấu là chuyển đổi trong GA4.</li>
+</ul>
+
+<footer>Báo cáo lập ngày 08/11/2026. Quan sát đối thủ thực hiện trực tiếp trên website của họ cùng ngày; không phải bảng thứ hạng Google.</footer>
+
+</body>
+</html>

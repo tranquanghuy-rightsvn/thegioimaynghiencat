@@ -966,3 +966,18 @@ body.is-locked { overflow: hidden; }
 .with-side > .article-wrap .article__body img { max-width: 100%; height: auto; }
 .with-side > .article-wrap .article__body iframe { max-width: 100%; }
 .with-side > .article-wrap .article__body table { display: block; max-width: 100%; overflow-x: auto; }
+/* section pages: company videos */
+.vids { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 10px; }
+.vid { margin: 0; background: var(--white); box-shadow: var(--shadow-1); }
+.vid__frame { position: relative; aspect-ratio: 16 / 9; background: #000; }
+.vid__frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vid figcaption { padding: 10px 12px 12px; font-size: 13.5px; line-height: 1.45; color: var(--text); }
+.vid figcaption a { font-weight: 600; }
+.sec-more { margin: 4px 0 30px; text-align: center; }
+.with-side__main .steps { margin-bottom: 30px; }
+.product h2.h4 a, .product h4 a { color: inherit; }
+@media (max-width: 767px) { .vids { grid-template-columns: 1fr; } }
+/* process steps: one row whatever the number of steps (desktop) */
+@media (min-width: 992px) {
+  .steps { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+}
