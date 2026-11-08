@@ -38,7 +38,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261108o"
+CSS_VER = "20261108r"
 JS_VER = "20261103b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
@@ -2013,7 +2013,10 @@ def section_videos(members, limit=3) -> list:
             m = re.search(r"youtube(?:-nocookie)?\.com/embed/([\w-]{11})", fr.get("src", "") or fr.get("data-src", ""))
             if m and m.group(1) not in seen:
                 seen.add(m.group(1))
-                out.append((m.group(1), clean(fr.get("title")) or p["title"], p))
+                title = clean(fr.get("title"))
+                if not title or title.lower() in ("youtube video player", "video", "youtube"):
+                    title = p["title"]  # generic embed title: use the article's
+                out.append((m.group(1), title, p))
             if len(out) >= limit:
                 return out
     return out

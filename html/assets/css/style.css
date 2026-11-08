@@ -990,3 +990,17 @@ body.is-locked { overflow: hidden; }
 .with-side__main .table-wrap ~ .sec-block { margin-top: 48px; }
 .with-side__main .vids { margin-bottom: 0; }
 .with-side__main .sec-more { margin: 22px 0 0; }
+/* small phones: one article card per row (machine grids stay 2 per row) */
+@media (max-width: 549px) {
+  .posts, .posts--3 { grid-template-columns: 1fr; gap: 16px; }
+  .post h3, .posts--3 .post h3 { font-size: 16px; padding: 12px 14px 6px; text-align: left; }
+  .post .post__meta { display: flex; padding: 0 14px 14px; }
+}
+/* featured images: show the whole picture (no cropping), cards stay the same size */
+.post__img { background: #eef1f5; }
+.post__img img { object-fit: contain; }
+.post:hover .post__img img { transform: scale(1.03); }
+/* machine images: whole picture too */
+.product__img { background: var(--white); }
+.product__img img { object-fit: contain; }
+.product:hover .product__img img { transform: scale(1.03); }
