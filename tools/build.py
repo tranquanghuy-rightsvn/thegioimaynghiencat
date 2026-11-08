@@ -163,6 +163,17 @@ def section_children(parent):
     return [(k, v) for k, v in SECTIONS.items() if v["parent"] == parent and k != parent]
 
 
+def load_old_lastmod() -> dict:
+    """path -> last-modified date from the old WordPress (Yoast) sitemaps,
+    saved in tools/data/old-sitemap/. Keeps the real update dates in our sitemap."""
+    out = {}
+    for f in sorted((ROOT / "tools" / "data" / "old-sitemap").glob("*-sitemap.xml")):
+        text = f.read_text(encoding="utf-8")
+        for loc, lm in re.findall(r"<loc>([^<]+)</loc>\s*<lastmod>([^<]+)</lastmod>", text):
+            out[unicodedata.normalize("NFC", url_path(loc))] = lm.strip()
+    return out
+
+
 def load_structure():
     path = ROOT / "tools" / "data" / "structure.tsv"
     out = {}
@@ -546,6 +557,13 @@ def build_model(raw, kept):
             "is_article": bool(dt),
         }
 
+    # Real "last modified" of each article: the old sitemap's date, never before publishing.
+    old_lastmod = load_old_lastmod()
+    for p in post_by_path.values():
+        pub = p["dt"].isoformat() if p["dt"] else ""
+        old = old_lastmod.get(unicodedata.normalize("NFC", p["path"]), "")
+        p["modified"] = old if old and old[:19] >= pub[:19] else pub
+
     # Section of each article (one per article; aliases follow their primary).
     structure = load_structure()
     unplaced = []
@@ -583,6 +601,7 @@ def build_model(raw, kept):
         "catalog": catalog,
         "featured": featured,
         "tag_names": tag_names,
+        "old_lastmod": old_lastmod,
     }
 
 
@@ -1386,10 +1405,29 @@ def main():
         return (order, p)
     sitemap_urls = sorted(set(sitemap_urls), key=sort_key)
     today = datetime.now().strftime("%Y-%m-%d")
+    old_lastmod = model["old_lastmod"]
+
+    def lastmod(p):
+        """Real date of the last change: the old site's sitemap for pages it had,
+        an article's own date, a listing's newest article; build date only for
+        pages that are new and list nothing."""
+        route = routes[p]
+        if route.get("post"):
+            return route["post"]["modified"]
+        members = route.get("members")
+        newest = max((m.get("modified") or "" for m in members), default="") if members else ""
+        old = old_lastmod.get(unicodedata.normalize("NFC", p), "")
+        if route["kind"] in ("tag", "category") or p in EXISTING:
+            return max(old, newest) or today
+        if route["kind"] == "solutions":
+            return max((x["modified"] for x in model["primary_posts"] if SECTIONS[x["section"]]["parent"] == "giai-phap"), default=today)
+        return newest or old or today
+
     entries = []
     for p in sitemap_urls:
         priority = "1.0" if p == "/" else "0.7" if p.startswith("/tag/") else "0.8"
-        entries.append(f"  <url><loc>{esc(BASE + p)}</loc><lastmod>{today}</lastmod><priority>{priority}</priority></url>")
+        lm = lastmod(p)[:10] if len(lastmod(p)) >= 10 else today
+        entries.append(f"  <url><loc>{esc(BASE + p)}</loc><lastmod>{lm}</lastmod><priority>{priority}</priority></url>")
     (SITE / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + "\n".join(entries) + "\n</urlset>\n", encoding="utf-8")
@@ -1617,7 +1655,7 @@ def generate_article(path, post, model, by_section, routes):
          "headline": post["title"], "description": desc,
          "image": [BASE + "/" + post["thumb"]] if post["thumb"] else [BASE + "/assets/img/sandvik.webp"],
          "datePublished": dt.isoformat() if dt else "",
-         "dateModified": dt.isoformat() if dt else "",
+         "dateModified": post["modified"] or (dt.isoformat() if dt else ""),
          "inLanguage": "vi-VN",
          "articleSection": sec["name"],
          "author": {"@type": "Organization", "name": "Thanh Long JSC", "url": BASE + "/gioithieu/"},
@@ -1631,7 +1669,7 @@ def generate_article(path, post, model, by_section, routes):
                                 canonical=canonical, body=body, nav=MENU_BY_KEY[sec["parent"]][3],
                                 jsonld=jsonld, noindex=noindex, og_type="article",
                                 image=post["thumb"],
-                                published=dt.isoformat() if dt else "", modified=dt.isoformat() if dt else ""))
+                                published=dt.isoformat() if dt else "", modified=post["modified"]))
 
 
 # ---------------------------------------------------------------------------
