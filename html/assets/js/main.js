@@ -42,7 +42,9 @@
   window.addEventListener('scroll', function () {
     if (!ticking) { window.requestAnimationFrame(onScroll); ticking = true; }
   }, { passive: true });
-  onScroll();
+  // Không gọi onScroll() ngay lúc khởi tạo: đọc window.scrollY khi DOM vừa đổi class sẽ ép trình duyệt
+  // tính layout đồng bộ (forced reflow). Nếu trang mở ở giữa (khôi phục vị trí cuộn, #neo),
+  // trình duyệt tự phát sự kiện scroll nên header vẫn đúng trạng thái.
 
   /* ---------- menu mobile trượt từ trái ---------- */
   var oc = $('#offcanvas');
@@ -151,7 +153,7 @@
   var filters = $$('.filter button');
   if (filters.length) {
     var cards = $$('[data-group]');
-    var applyFilter = function (key, scroll) {
+    var applyFilter = function (key, scroll, animate) {
       var valid = filters.some(function (b) { return b.getAttribute('data-filter') === key; });
       if (!valid) key = 'all';
       filters.forEach(function (b) {
@@ -159,17 +161,26 @@
         b.classList.toggle('is-active', on);
         b.setAttribute('aria-pressed', on);
       });
+      var shown = [];
       cards.forEach(function (c) {
         var show = key === 'all' || c.getAttribute('data-group') === key;
         c.hidden = !show;
-        if (show) { c.classList.remove('is-in'); void c.offsetWidth; c.classList.add('is-in'); }
+        c.classList.remove('is-in');
+        if (show) shown.push(c);
       });
+      // chạy lại hiệu ứng hiện thẻ: thêm class ở 2 frame sau thay cho "void offsetWidth"
+      // (đọc offsetWidth trong vòng lặp gây forced reflow cho từng thẻ)
+      if (animate) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { shown.forEach(function (c) { c.classList.add('is-in'); }); });
+        });
+      }
       if (scroll) $('#loc').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
     };
     filters.forEach(function (b) {
       b.addEventListener('click', function () {
         var key = b.getAttribute('data-filter');
-        applyFilter(key);
+        applyFilter(key, false, true);
         history.replaceState(null, '', key === 'all' ? location.pathname : '#' + key);
       });
     });
@@ -231,4 +242,24 @@
   window.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && oc.classList.contains('is-open')) setMenu(false);
   });
+
+  /* ---------- ảnh dưới màn hình đầu (img[data-lazy]): chỉ tải sau sự kiện load ----------
+     Ảnh giữ nguyên chất lượng; chỉ dời thời điểm tải để không tranh băng thông với ảnh banner (LCP).
+     Có <noscript> kèm theo cho trình duyệt tắt JS. */
+  var lazyImgs = $$('img[data-lazy]');
+  if (lazyImgs.length) {
+    var show = function (img) {
+      if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+      img.src = img.dataset.lazy;
+      img.removeAttribute('data-lazy'); img.removeAttribute('data-srcset');
+    };
+    var startLazy = function () {
+      if (!('IntersectionObserver' in window)) { lazyImgs.forEach(show); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { show(e.target); io.unobserve(e.target); } });
+      }, { rootMargin: '600px 0px' });
+      lazyImgs.forEach(function (img) { io.observe(img); });
+    };
+    if (document.readyState === 'complete') startLazy(); else window.addEventListener('load', startLazy);
+  }
 })();

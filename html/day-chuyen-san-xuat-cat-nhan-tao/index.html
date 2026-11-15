@@ -98,7 +98,7 @@
 <meta name="google-site-verification" content="z8l8TUBn-hxC0r7h60EfB9fWZS6aReABiX72CMIWDnQ" />
 <!-- Google tag (GT-PZSCJG4, Site Kit) + Google Tag Manager (GTM-M3XKBSNK, có GA4 G-VDFBZC3D97 bên trong).
      Lệnh gtag/dataLayer chạy ngay; file gtag.js và gtm.js chỉ tải khi người dùng tương tác lần đầu
-     hoặc 5 giây sau khi trang tải xong, để không chặn hiển thị trang. -->
+     hoặc 10 giây sau khi trang tải xong, để không chặn hiển thị trang. -->
 <script>
 window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
 gtag("set","linker",{"domains":["thegioimaynghienda.com"]});
@@ -117,7 +117,7 @@ dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
     });
   }
   ev.forEach(function (e) { addEventListener(e, load, { once: true, passive: true }); });
-  addEventListener('load', function () { setTimeout(load, 5000); });
+  addEventListener('load', function () { setTimeout(load, 10000); });
 })();
 </script>
 <!-- tracking:end -->
@@ -454,6 +454,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </nav>
   <!-- /layout:footer -->
 
-  <script src="../assets/js/main.js?v=20261115a" defer></script>
+  <script src="../assets/js/main.js?v=20261115b" defer></script>
 </body>
 </html>

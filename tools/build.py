@@ -39,7 +39,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
 CSS_VER = "20261115a"
-JS_VER = "20261115a"
+JS_VER = "20261115b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
 EXISTING = {
@@ -1579,6 +1579,7 @@ def main():
     normalize_existing_heads()
     link_catalog_cards()
     inline_home_css()
+    defer_home_images()
     generate_404()
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
@@ -2279,6 +2280,38 @@ def inline_home_css():
     h = re.sub(r'<link rel="stylesheet" href="assets/css/style\.css\?v=[^"]*">', lambda m: block, h, count=1)
     f.write_text(h, encoding="utf-8")
     print(f"index.html: CSS nhúng {len(css) // 1024} KiB")
+
+
+def defer_home_images():
+    """Trang chủ: ảnh dưới màn hình đầu (img loading="lazy") đổi src thành data-lazy để
+    main.js chỉ tải sau sự kiện load. Trên mạng chậm Chrome tải sớm cả ảnh lazy nằm cách
+    màn hình ~1.250–2.500 px, tranh băng thông với ảnh banner (LCP). Ảnh giữ nguyên file
+    gốc. src tạm là SVG rỗng cùng tỉ lệ width/height (giữ CLS = 0); <noscript> cho trình
+    duyệt tắt JS. Chạy nhiều lần không sao (ảnh đã đổi thì bỏ qua)."""
+    f = SITE / "index.html"
+    h = f.read_text(encoding="utf-8")
+
+    def fix(m):
+        tag = m.group(0)
+        if "data-lazy" in tag or 'loading="lazy"' not in tag:
+            return tag
+        src = re.search(r'\ssrc="([^"]+)"', tag)
+        w = re.search(r'\swidth="(\d+)"', tag)
+        hh = re.search(r'\sheight="(\d+)"', tag)
+        if not (src and w and hh):
+            return tag
+        ph = (f"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' "
+              f"viewBox='0 0 {w.group(1)} {hh.group(1)}'%3E%3C/svg%3E")
+        lazy = tag.replace(src.group(0), f' src="{ph}" data-lazy="{src.group(1)}"', 1)
+        lazy = lazy.replace(' loading="lazy"', ' decoding="async"', 1)
+        return lazy + f"<noscript data-lazy-fallback>{tag}</noscript>"
+
+    body_at = h.index("<body")
+    # ảnh nằm trong <noscript> (bản dự phòng đã thêm ở lần chạy trước) thì giữ nguyên
+    parts = re.split(r"(<noscript\b.*?</noscript>)", h[body_at:], flags=re.S)
+    h = h[:body_at] + "".join(p if p.startswith("<noscript") else re.sub(r"<img\b[^>]*>", fix, p)
+                              for p in parts)
+    f.write_text(h, encoding="utf-8")
 
 
 def link_catalog_cards():
