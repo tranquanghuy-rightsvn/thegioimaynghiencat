@@ -6,3 +6,4 @@ node_modules/
 tools/cache/
 tools/data/raw.pkl
 tools/data/gsc/
+__pycache__/

@@ -118,7 +118,7 @@
 /product-category/may-lam-cat/ /may-lam-cat-nhan-tao/ 301
 /product-category/may-lam-cat/https://thegioimaynghienda.com/product-category/may-lam-cat/ /san-pham/ 301
 /product-category/may-nghien-da/ /may-nghien-da-1x2-lon-nhat-tai-viet-nam/ 301
-/product/cap-lieu-rung-dong-sz-tu-nha-san-xuat-srh-thanh-long-jsc/ /san-pham/sang-rung-phu-tung/ 301
+/product/cap-lieu-rung-dong-sz-tu-nha-san-xuat-srh-thanh-long-jsc/ /san-pham/may-nghien-da/ 301
 /product/may-kep-ham/ /san-pham/may-nghien-da/ 301
 /product/may-lam-cat-nhan-tao/ /may-lam-cat-nhan-tao/ 301
 /product/may-nghien-cat-may-vo-da-dong-sv/ /san-pham/ 301
@@ -138,9 +138,9 @@
 /product/may-rua-cat/ /may-rua-cat-doi-tai-hai-duong/ 301
 /product/may-tach-cat-min/ /may-tach-cat-min/ 301
 /product/may-tach-nuoc/ /san-pham/may-rua-cat/ 301
-/product/sang-rung-phan-loai-dong-ss-tu-nha-san-xuat-srh-thanh-long-jsc/ /san-pham/sang-rung-phu-tung/ 301
-/product/sang-rung-phan-loai-dong-ss-tu-nha-san-xuat-srh-the-part-of-metso/ /san-pham/sang-rung-phu-tung/ 301
-/product/sang-rung-phan-loai/ /san-pham/sang-rung-phu-tung/ 301
+/product/sang-rung-phan-loai-dong-ss-tu-nha-san-xuat-srh-thanh-long-jsc/ /san-pham/may-nghien-da/ 301
+/product/sang-rung-phan-loai-dong-ss-tu-nha-san-xuat-srh-the-part-of-metso/ /san-pham/may-nghien-da/ 301
+/product/sang-rung-phan-loai/ /san-pham/may-nghien-da/ 301
 /product/thiet-bi-tach-nuoc-lam-kho-cat-mclanahan-ultradry/ /san-pham/ 301
 /rua-cat-va-nghien-cat/ /rua-cat-va-nghien-cat-nen-chon-cong-nghe-nao/ 301
 /tag/ba-rau/ /nhan-bao-gia/ 301
@@ -344,6 +344,8 @@
 /tag/thieu-thuy/ /nhan-bao-gia/ 301
 /tag/women-3/ /nhan-bao-gia/ 301
 /tag/xi-mang/ /nhan-bao-gia/ 301
+/dich-vu/may-cu-thanh-ly/ /san-pham/may-nghien-da/ 301
+/san-pham/sang-rung-phu-tung/ /san-pham/phu-tung-skf/ 301
 /tag/b%E1%BA%A3o-du%C3%B5ng-day-chuyen-may-nghien-da/ /tag/ba%CC%89o-duo%CC%83ng-day-chuyen-may-nghien-da/ 301
 /tag/b%E1%BA%A3o-tri-day-chuyen-may-nghien-da/ /tag/ba%CC%89o-tri-day-chuyen-may-nghien-da/ 301
 /tag/b%E1%BA%A3o-tri-may-nghien-con/ /tag/ba%CC%89o-tri-may-nghien-con/ 301

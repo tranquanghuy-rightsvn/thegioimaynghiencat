@@ -5,6 +5,7 @@
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000
+  Cross-Origin-Opener-Policy: same-origin
 
 # CSS/JS are versioned (?v=...), fonts never change: cache 1 year
 /assets/css/*

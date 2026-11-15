@@ -20,10 +20,17 @@
   var toTop = $('#toTop');
   var STICK_AT = 300;
   var ticking = false;
+  // chiều cao header đo sẵn bằng ResizeObserver: không đọc offsetHeight lúc cuộn (tránh forced reflow)
+  var headerH = 0;
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(function (en) {
+      if (!wrap.classList.contains('stuck')) headerH = Math.round(en[0].borderBoxSize ? en[0].borderBoxSize[0].blockSize : en[0].contentRect.height);
+    }).observe(header);
+  }
   function onScroll() {
     var y = window.scrollY;
     if (y > STICK_AT && !wrap.classList.contains('stuck')) {
-      header.style.minHeight = header.offsetHeight + 'px';
+      header.style.minHeight = (headerH || header.offsetHeight) + 'px';
       wrap.classList.add('stuck');
     } else if (y <= STICK_AT && wrap.classList.contains('stuck')) {
       wrap.classList.remove('stuck');
@@ -82,7 +89,6 @@
       slides.forEach(function (s, j) {
         s.classList.toggle('is-active', j === cur);
         s.setAttribute('aria-hidden', j !== cur);
-        if (j === (cur + 1) % slides.length) $('img', s).loading = 'eager';
       });
       dots.forEach(function (d, j) {
         d.classList.toggle('is-active', j === cur);
@@ -111,6 +117,15 @@
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) clearInterval(timer); else play();
     });
+    // ảnh slide 2, 3 chỉ tải sau khi trang tải xong để không tranh băng thông với ảnh slide đầu (LCP)
+    var loadSlides = function () {
+      $$('img[data-src]', slider).forEach(function (img) {
+        if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src'); img.removeAttribute('data-srcset');
+      });
+    };
+    if (document.readyState === 'complete') loadSlides(); else window.addEventListener('load', loadSlides);
     go(0);
     play();
   }
@@ -185,6 +200,33 @@
     pickOption(qProduct, params.get('sp'));
     pickOption(qCap, params.get('cap'));
   }
+
+  /* ---------- form báo giá / liên hệ: kiểm tra rồi mở ứng dụng email (không dùng action="mailto:") ---------- */
+  $$('form[data-mailto]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var firstBad = null;
+      $$('input, select, textarea', form).forEach(function (el) {
+        var box = el.closest('.field');
+        var bad = el.willValidate && !el.checkValidity();
+        if (box) box.classList.toggle('is-err', bad);
+        el.setAttribute('aria-invalid', bad);
+        if (bad && !firstBad) firstBad = el;
+      });
+      if (firstBad) { firstBad.focus(); return; }
+      var subject = '', lines = [];
+      $$('input, select, textarea', form).forEach(function (el) {
+        if (!el.name || !el.value) return;
+        if (el.name === 'subject') { subject = el.value; return; }
+        var lb = el.id && $('label[for="' + el.id + '"]', form);
+        var name = lb ? lb.textContent.replace('*', '').trim() : el.name;
+        lines.push(name + ': ' + el.value);
+      });
+      window.location.href = 'mailto:' + form.getAttribute('data-mailto') +
+        '?subject=' + encodeURIComponent(subject || document.title) +
+        '&body=' + encodeURIComponent(lines.join('\n'));
+    });
+  });
 
   window.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && oc.classList.contains('is-open')) setMenu(false);

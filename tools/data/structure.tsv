@@ -21,7 +21,7 @@ bao-gia-may-rua-cat-nhan-tao	tb-rua-cat	Máy rửa cát McLanahan dòng UltraWAS
 cac-loai-may-nghien-da-ban-chay-nhat-nam-2021	tb-nghien-da	Các loại máy nghiền đá bán chạy nhất năm 2021
 cac-loai-may-rua-cat-tai-may-nghien-da-thanh-long-jsc	tb-rua-cat	CÁC LOẠI MÁY RỬA CÁT TẠI MÁY NGHIỀN ĐÁ THANH LONG JSC
 cac-loai-may-tuyen-tu-trong-day-chuyen-tuyen-quang-sat	gp-tuyen-quang	Các loại máy tuyển từ trong dây chuyền tuyển quặng sắt
-cac-nguyen-tac-co-ban-khi-mua-may-nghien-da-tai-ninh-thuan	dv-may-cu	Các nguyên tắc cơ bản khi mua máy nghiền đá cũ tại Ninh Thuận
+cac-nguyen-tac-co-ban-khi-mua-may-nghien-da-tai-ninh-thuan	tb-nghien-da	Các nguyên tắc cơ bản khi mua máy nghiền đá cũ tại Ninh Thuận
 cach-chon-may-nghien-da-xay-dung-phu-hop-tu-van-chuyen-gia-may-nghien-da-thanh-long	tb-nghien-da	Cách chọn máy nghiền đá xây dựng phù hợp – Tư vấn từ chuyên gia
 cao-toc-dong-dang-tra-linh-day-chuyen-nghien-da-va-cat-nao-phu-hop	kt-thi-truong	CAO TỐC ĐỒNG ĐĂNG – TRÀ LĨNH – DÂY CHUYỀN NGHIỀN ĐÁ VÀ CÁT NÀO PHÙ HỢP?
 cap-phoi-cat-xay-dung-tram-nghien-cat-nhan-tao	kt-cat-vlxd	Cấp phối cát xây dựng trạm nghiền cát nhân tạo
@@ -147,7 +147,7 @@ may-nghien-da-chia-khoa-trao-tay-cho-khoang-san-vung-tay-nguyen	gp-nghien-da	Má
 may-nghien-da-chia-khoa-trao-tay-giai-phap-toan-dien-cho-nha-dau-tu	gp-nghien-da	GIẢI PHÁP TOÀN DIỆN MÁY NGHIỀN ĐÁ CHÌA KHÓA TRAO TAY – CHO NHÀ ĐẦU TƯ KHAI THÁC ĐÁ
 may-nghien-da-cong-nghe-moi-hieu-qua	tb-nghien-da	Máy Nghiền Đá Công Nghệ Mới Có Thật Sự Như Lời Đồn?
 may-nghien-da-cong-suat-nho-giai-phap-cho-san-xuat-vat-lieu-xay-dung-quy-mo-vua-va-nho	tb-nghien-da	Giải pháp cho sản xuất vật liệu xây dựng quy mô vừa và nhỏ
-may-nghien-da-cu-tai-dong-nai	dv-may-cu	MÁY NGHIỀN ĐÁ CŨ TẠI ĐỒNG NAI
+may-nghien-da-cu-tai-dong-nai	tb-nghien-da	MÁY NGHIỀN ĐÁ CŨ TẠI ĐỒNG NAI
 may-nghien-da-dat-chuan-iso-dau-tu-thiet-bi-chat-luong-cao	tb-nghien-da	Máy nghiền đá đạt chuẩn ISO – Đầu tư thiết bị chất lượng cao
 may-nghien-da-di-dong-cho-mo-da-tru-luong-nho-rai-rac	tb-di-dong	Máy nghiền đá di động cho mỏ đá trữ lượng nhỏ, rải rác
 may-nghien-da-granite	tb-nghien-da	Giao hàng máy nghiền đá Granite tại Lâm Đồng, cấp phối cao tốc Bắc – Nam
@@ -215,7 +215,7 @@ tai-sao-nghien-soi-doi-thanh-cat-phai-can-he-thong-xit-rua-tren-sang-phan-loai	g
 thanh-long-ban-giao-tram-thu-8-nghien-da-0x4-va-rua-cat-tieu-chuan-tai-binh-phuoc	du-an	Thanh Long Bàn giao trạm thứ 8 nghiền đá 0x4 và rửa cát tiêu chuẩn tại Bình Phước
 thanh-long-jsc-ban-giao-may-nghien-da-voi	du-an	Thanh Long JSC Bàn Giao Máy Nghiền Đá Vôi Tại Hà Nam
 thanh-long-jsc-may-xay-da-xay-dung-1x2	tb-nghien-da	MÁY XAY ĐÁ XÂY DỰNG 1X2 – MÁY NGHIỀN ĐÁ THANH LONG JSC
-thanh-ly-tram-nghien-da-tai-ninh-thuan	dv-may-cu	Thanh lý trạm nghiền đá tại Ninh Thuận
+thanh-ly-tram-nghien-da-tai-ninh-thuan	tb-nghien-da	Thanh lý trạm nghiền đá tại Ninh Thuận
 thiet-bi-may-nghien-cat-nh-n-tao	tb-lam-cat	THIẾT BỊ MÁY NGHIỀN CÁT NHÂN TẠO
 thiet-bi-phan-cap-trong-day-chuyen-tuyen-quang	gp-tuyen-quang	Thiết bị phân cấp trong dây chuyền tuyển quặng
 thuc-day-phuc-hoi-nganh-da-xay-dung-sau-dai-dich-covid-19	kt-thi-truong	Thúc đẩy phục hồi ngành đá xây dựng sau đại dịch Covid 19
@@ -232,7 +232,7 @@ toi-uu-hieu-suat-may-nghien-con	kt-ky-thuat	12 Cách tối ưu hiệu suất má
 top-4-nha-san-xuat-may-nghien-ham-uy-tin-nhat-the-gioi-ho-la-ai	kt-thi-truong	Top 4 nhà sản xuất máy nghiền hàm uy tín nhất thế giới, họ là ai ?
 tram-nghien-cat-nhan-tao-co-thiet-bi-gi-de-thay-the-nan-cat-tac	gp-cat-nhan-tao	Trạm nghiền cát nhân tạo có thiết bị gì để thay thế nạn “cát tặc”
 tram-nghien-da-cat-ket-tai-dien-bien-bien-thanh-cat-nhan-tao	gp-cat-nhan-tao	Trạm nghiền đá cát kết tại Điện Biên “biến thành” cát nhân tạo
-tram-nghien-da-cu-gia-re	dv-may-cu	“ 3 đừng – 7 nên “ khi mua trạm nghiền đá cũ giá rẻ
+tram-nghien-da-cu-gia-re	tb-nghien-da	“ 3 đừng – 7 nên “ khi mua trạm nghiền đá cũ giá rẻ
 tram-nghien-da-xay-dung	gp-nghien-da	Trạm nghiền đá xây dựng Bình Định – cách lựa chọn công nghệ tiết kiệm
 ung-dung-cat-nhan-tao-trong-nganh-xay-dung	kt-cat-vlxd	Ứng dụng cát nhân tạo trong ngành xây dựng
 ung-dung-cua-tram-tuyen-quang-sat	gp-tuyen-quang	Ứng dụng của trạm tuyển quặng sắt

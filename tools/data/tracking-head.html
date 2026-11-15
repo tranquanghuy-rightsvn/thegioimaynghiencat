@@ -1,31 +1,26 @@
 <meta name="google-site-verification" content="IkqZ4q1TeTMrmeP5MG8O_A_zcaiv0wt41GtwTDlo49g" />
-<!-- Đoạn mã Google tag (gtag.js) được thêm bởi Site Kit -->
-<!-- Đoạn mã Google Analytics được thêm bởi Site Kit -->
-<script type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=GT-PZSCJG4" id="google_gtagjs-js" async></script>
-<script type="text/javascript" id="google_gtagjs-js-after">
-/* <![CDATA[ */
+<meta name="google-site-verification" content="z8l8TUBn-hxC0r7h60EfB9fWZS6aReABiX72CMIWDnQ" />
+<!-- Google tag (GT-PZSCJG4, Site Kit) + Google Tag Manager (GTM-M3XKBSNK, có GA4 G-VDFBZC3D97 bên trong).
+     Lệnh gtag/dataLayer chạy ngay; file gtag.js và gtm.js chỉ tải khi người dùng tương tác lần đầu
+     hoặc 5 giây sau khi trang tải xong, để không chặn hiển thị trang. -->
+<script>
 window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
 gtag("set","linker",{"domains":["thegioimaynghienda.com"]});
 gtag("js", new Date());
 gtag("set", "developer_id.dZTNiMT", true);
 gtag("config", "GT-PZSCJG4");
- window._googlesitekit = window._googlesitekit || {}; window._googlesitekit.throttledEvents = []; window._googlesitekit.gtagEvent = (name, data) => { var key = JSON.stringify( { name, data } ); if ( !! window._googlesitekit.throttledEvents[ key ] ) { return; } window._googlesitekit.throttledEvents[ key ] = true; setTimeout( () => { delete window._googlesitekit.throttledEvents[ key ]; }, 5 ); gtag( "event", name, { ...data, event_source: "site-kit", ...( data && data.user_data ? {"developer_id.dZjRkOT":true} : {} ) } ); }; 
-/* ]]> */
+window._googlesitekit = window._googlesitekit || {}; window._googlesitekit.throttledEvents = []; window._googlesitekit.gtagEvent = (name, data) => { var key = JSON.stringify( { name, data } ); if ( !! window._googlesitekit.throttledEvents[ key ] ) { return; } window._googlesitekit.throttledEvents[ key ] = true; setTimeout( () => { delete window._googlesitekit.throttledEvents[ key ]; }, 5 ); gtag( "event", name, { ...data, event_source: "site-kit", ...( data && data.user_data ? {"developer_id.dZjRkOT":true} : {} ) } ); };
+dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+(function () {
+  var done = false, ev = ['scroll', 'pointerdown', 'touchstart', 'keydown', 'mousemove'];
+  function load() {
+    if (done) return; done = true;
+    ev.forEach(function (e) { removeEventListener(e, load, { passive: true }); });
+    ['https://www.googletagmanager.com/gtag/js?id=GT-PZSCJG4', 'https://www.googletagmanager.com/gtm.js?id=GTM-M3XKBSNK'].forEach(function (u) {
+      var s = document.createElement('script'); s.async = true; s.src = u; document.head.appendChild(s);
+    });
+  }
+  ev.forEach(function (e) { addEventListener(e, load, { once: true, passive: true }); });
+  addEventListener('load', function () { setTimeout(load, 5000); });
+})();
 </script>
-<meta name="google-site-verification" content="z8l8TUBn-hxC0r7h60EfB9fWZS6aReABiX72CMIWDnQ" />
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VDFBZC3D97"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VDFBZC3D97');
-</script>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-M3XKBSNK');</script>
-<!-- End Google Tag Manager -->

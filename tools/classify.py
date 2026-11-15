@@ -73,7 +73,7 @@ def classify(slug: str, title: str) -> str:
     line = has(t, ["day chuyen", "tram nghien", "tram tuyen", "tram san xuat", "he thong", "chia khoa trao tay"])
 
     if has(t, ["may nghien da cu", "tram nghien da cu", "may cu", "thanh ly"]):
-        return "dv-may-cu"
+        return "tb-nghien-da"
     if has(t, ["dich vu", "bao tri", "sua chua", "su co", "bao duong"]):
         return "dv-bao-tri"
     if has(t, ["bao gia da", "bao gia cat", "gia cat", "gia da ", "thi truong", "thuc trang", "tiem nang",
@@ -98,8 +98,10 @@ def classify(slug: str, title: str) -> str:
         if line or has(t, ["cong nghe", "cung cap"]):
             return "gp-cat-nhan-tao"
         return "tb-lam-cat"
-    if has(t, ["sang rung", "vong bi", "bac dan", "cap lieu", "bang tai"]):
+    if has(t, ["vong bi", "bac dan", "skf"]):
         return "tb-sang-phu-tung"
+    if has(t, ["sang rung", "cap lieu", "bang tai"]):
+        return "tb-nghien-da"
     if has(t, ["van hanh", "an toan", "quy trinh", "cuong do", "da 1 2", "da voi", "vat lieu dau vao",
                "sai lam", "loi ich", "toi uu"]):
         return "kt-ky-thuat"

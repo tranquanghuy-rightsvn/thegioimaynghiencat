@@ -38,8 +38,8 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261108r"
-JS_VER = "20261103b"
+CSS_VER = "20261115a"
+JS_VER = "20261115a"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
 EXISTING = {
@@ -104,8 +104,8 @@ MENU_BY_KEY = {m[0]: m for m in MENU}
 SECTIONS = {
     # Thiết bị: product cards (by name, from /san-pham/) + articles
     "tb-nghien-da": {"parent": "thiet-bi", "name": "Máy nghiền đá", "path": "/san-pham/may-nghien-da/",
-                     "products": ["Máy nghiền hàm", "Máy nghiền côn", "Máy nghiền phản kích", "Máy nghiền búa"],
-                     "intro": "Máy nghiền hàm, nghiền côn, phản kích và nghiền búa cho dây chuyền đá xây dựng 50 – 2.000 tấn/giờ: nghiền thô, nghiền trung và nghiền mịn theo loại đá và sản phẩm đầu ra."},
+                     "products": ["Máy nghiền hàm", "Máy nghiền côn", "Máy nghiền phản kích", "Máy nghiền búa", "Sàng rung phân loại"],
+                     "intro": "Máy nghiền hàm, nghiền côn, phản kích và nghiền búa cho dây chuyền đá xây dựng 50 – 2.000 tấn/giờ: nghiền thô, nghiền trung và nghiền mịn theo loại đá và sản phẩm đầu ra. Kèm sàng rung phân loại, máy cấp liệu và thông tin máy nghiền, trạm nghiền cũ, thanh lý."},
     "tb-lam-cat": {"parent": "thiet-bi", "name": "Máy làm cát nhân tạo VSI", "path": "/san-pham/may-lam-cat/",
                    "products": ["Máy làm cát VSI"],
                    "intro": "Máy làm cát VSI vo đá ra cát hạt khối, tỷ lệ cát 35 – 50%, tiền điện chỉ khoảng 3.750 đồng mỗi khối cát. Nghiền đá, sỏi sông, đá cát kết thành cát xây dựng."},
@@ -118,9 +118,9 @@ SECTIONS = {
     "tb-tuyen-quang": {"parent": "thiet-bi", "name": "Thiết bị tuyển quặng", "path": "/san-pham/thiet-bi-tuyen-quang/",
                        "products": ["Máy nghiền bi"],
                        "intro": "Máy nghiền bi nghiền mịn quặng, khoáng sản và thiết bị tuyển từ, phân cấp cho trạm tuyển quặng sắt."},
-    "tb-sang-phu-tung": {"parent": "thiet-bi", "name": "Sàng rung, cấp liệu & phụ tùng SKF", "path": "/san-pham/sang-rung-phu-tung/",
-                         "products": ["Sàng rung phân loại", "Bạc đạn cầu rãnh sâu", "Bạc đạn đũa côn", "Bạc đạn tang trống", "Gối đỡ vòng bi SKF"],
-                         "intro": "Sàng rung phân loại tách cỡ 0–5, 5–10, 10–20, 20–40 mm và vòng bi SKF chính hãng cho máy nghiền, sàng rung: bạc đạn cầu, đũa côn, tang trống, gối đỡ SNL, SY."},
+    "tb-sang-phu-tung": {"parent": "thiet-bi", "name": "Phụ tùng SKF", "path": "/san-pham/phu-tung-skf/",
+                         "products": ["Bạc đạn cầu rãnh sâu", "Bạc đạn đũa côn", "Bạc đạn tang trống", "Gối đỡ vòng bi SKF"],
+                         "intro": "Vòng bi SKF chính hãng cho máy nghiền, sàng rung: bạc đạn cầu rãnh sâu, đũa côn, tang trống và gối đỡ SNL, SY."},
     # Giải pháp: production lines by what the customer wants to make
     "gp-nghien-da": {"parent": "giai-phap", "name": "Dây chuyền nghiền đá xây dựng", "path": "/giai-phap/day-chuyen-nghien-da/",
                      "products": ["Dây chuyền nghiền đồng bộ"], "capacity": True,
@@ -143,8 +143,6 @@ SECTIONS = {
     # Dịch vụ
     "dv-bao-tri": {"parent": "dich-vu", "name": "Bảo trì, sửa chữa", "path": "/dich-vu/bao-tri-sua-chua/",
                    "intro": "Bảo trì định kỳ, sửa chữa, xử lý sự cố và thay thế vật tư cho máy nghiền hàm, nghiền côn, máy làm cát và trạm nghiền."},
-    "dv-may-cu": {"parent": "dich-vu", "name": "Máy cũ & thanh lý", "path": "/dich-vu/may-cu-thanh-ly/",
-                  "intro": "Kinh nghiệm mua máy nghiền đá, trạm nghiền cũ và thông tin thanh lý trạm nghiền."},
     # Kiến thức
     "kt-ky-thuat": {"parent": "kien-thuc", "name": "Kỹ thuật & vận hành", "path": "/kien-thuc/ky-thuat-van-hanh/",
                     "intro": "Chọn máy theo loại đá, quy trình khai thác và sản xuất đá xây dựng, vận hành an toàn và tối ưu năng suất máy nghiền."},
@@ -173,6 +171,11 @@ SECTION_PROJECT_KW = {
     "tb-tuyen-quang": ["quặng"], "gp-tuyen-quang": ["quặng"], "tb-sang-phu-tung": ["nghiền đá"],
 }
 SECTION_BY_PATH = {v["path"]: k for k, v in SECTIONS.items()}
+# section pages that were removed / renamed -> where their posts went (301 in _redirects)
+MOVED_SECTIONS = {
+    "/dich-vu/may-cu-thanh-ly/": "/san-pham/may-nghien-da/",
+    "/san-pham/sang-rung-phu-tung/": "/san-pham/phu-tung-skf/",
+}
 # Dịch vụ menu also has the hand-built service page
 SERVICE_LINKS = [("Lắp đặt & chuyển giao", "/dich-vu/")]
 LEGACY_CATEGORIES = {"video"}  # old WordPress categories still kept as they were
@@ -1570,10 +1573,12 @@ def main():
     # old pagination of re-scoped listings (e.g. /category/tu-van-ky-thuat/page/15/)
     gone_pages = {p: re.sub(r"page/\d+/$", "", p) for p in model["kept_paths"]
                   if p not in routes and re.search(r"/page/\d+/$", p) and re.sub(r"page/\d+/$", "", p) in routes}
+    gone_pages.update({p: d for p, d in MOVED_SECTIONS.items() if p not in routes and d in routes})
     write_redirects(rows, routes, gone_pages)
     remove_stale_pages(routes)
     normalize_existing_heads()
     link_catalog_cards()
+    inline_home_css()
     generate_404()
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
@@ -1613,8 +1618,8 @@ REDIRECT_SKIP = {"/xmlrpc.php", "/wp-login.php"}
 REDIRECT_PRODUCT_KW = [
     ("vo-da", "/product/may-lam-cat-nhan-tao/"), ("may-nghien-cat", "/product/may-lam-cat-nhan-tao/"),
     ("may-nghien-con", "/product/may-nghien-con/"), ("may-nghien-ham", "/san-pham/may-nghien-da/"),
-    ("may-kep-ham", "/san-pham/may-nghien-da/"), ("sang-rung", "/san-pham/sang-rung-phu-tung/"),
-    ("cap-lieu", "/san-pham/sang-rung-phu-tung/"), ("mclanahan", "/product/may-rua-cat/"),
+    ("may-kep-ham", "/san-pham/may-nghien-da/"), ("sang-rung", "/san-pham/may-nghien-da/"),
+    ("cap-lieu", "/san-pham/may-nghien-da/"), ("mclanahan", "/product/may-rua-cat/"),
     ("may-tach-nuoc", "/san-pham/may-rua-cat/"),
 ]
 
@@ -1832,7 +1837,6 @@ LINK_HUBS = [
     (["trạm nghiền di động", "máy nghiền di động"], "/san-pham/tram-nghien-di-dong/"),
     (["máy nghiền đá xây dựng", "máy nghiền đá"], "/san-pham/may-nghien-da/"),
     (["bảo trì máy nghiền", "sửa chữa máy nghiền"], "/dich-vu/bao-tri-sua-chua/"),
-    (["máy nghiền đá cũ", "trạm nghiền cũ"], "/dich-vu/may-cu-thanh-ly/"),
 ]
 LINK_PILLARS = [
     (["máy nghiền hàm", "máy kẹp hàm"], "/cau-tao-va-nguyen-ly-hoat-dong-cua-may-nghien-ham/"),
@@ -2247,6 +2251,34 @@ def machine_page(name: str):
             if name in sec.get("products", []):
                 return sec["path"]
     return None
+
+
+def minify_css(css: str) -> str:
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    css = re.sub(r"\s+", " ", css)
+    css = re.sub(r"\s*([{};,>])\s*", r"\1", css)
+    return css.replace(";}", "}").strip()
+
+
+HOME_FONT_PRELOAD = ("montserrat-latin.woff2", "open-sans-latin.woff2")
+
+
+def inline_home_css():
+    """Trang chủ (trang đo PageSpeed): nhúng style.css đã minify vào <head> thay cho
+    <link rel="stylesheet"> để không có yêu cầu chặn hiển thị, và preload font chính.
+    Nguồn CSS vẫn là assets/css/style.css; chạy lại build là cập nhật khối nhúng."""
+    f = SITE / "index.html"
+    h = f.read_text(encoding="utf-8")
+    css = minify_css((SITE / "assets" / "css" / "style.css").read_text(encoding="utf-8"))
+    css = css.replace("url(../fonts/", "url(assets/fonts/").replace("url('../fonts/", "url('assets/fonts/")
+    preload = "".join(f'<link rel="preload" href="assets/fonts/{n}" as="font" type="font/woff2" crossorigin>\n  '
+                      for n in HOME_FONT_PRELOAD)
+    block = f'{preload}<style id="css-inline">{css}</style>'
+    h = re.sub(r'(?:<link rel="preload" href="assets/fonts/[^"]+" as="font"[^>]*>\s*)*<style id="css-inline">.*?</style>',
+               lambda m: block, h, flags=re.S)
+    h = re.sub(r'<link rel="stylesheet" href="assets/css/style\.css\?v=[^"]*">', lambda m: block, h, count=1)
+    f.write_text(h, encoding="utf-8")
+    print(f"index.html: CSS nhúng {len(css) // 1024} KiB")
 
 
 def link_catalog_cards():
