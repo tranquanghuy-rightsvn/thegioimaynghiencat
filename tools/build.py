@@ -1205,6 +1205,76 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
 # ---------------------------------------------------------------------------
 # generation
 # ---------------------------------------------------------------------------
+def generate_llms_txt(routes, model):
+    """/llms.txt (llmstxt.org): a Markdown map of the site for AI assistants.
+    Lists the fixed pages, products, every section with its intro and the
+    indexable articles of each section. Tags and paginated lists are left out."""
+    def clean(text, limit=180):
+        text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text or ""))).strip()
+        if len(text) > limit:
+            text = text[:limit].rsplit(" ", 1)[0].rstrip(",.;:–- ") + "…"
+        return text
+
+    def item(name, path, note=""):
+        note = clean(note)
+        return f"- [{clean(name, 200)}]({BASE}{path})" + (f": {note}" if note else "")
+
+    out = [
+        f"# {SITE_NAME} – Thanh Long JSC",
+        "",
+        "> Website của Công ty Cổ phần Thiết bị và Dịch vụ Kỹ thuật Thanh Long (Thanh Long JSC): "
+        "cung cấp, lắp đặt, bảo trì máy nghiền đá, máy làm cát nhân tạo VSI, máy rửa cát, "
+        "trạm nghiền di động và dây chuyền nghiền sàng 50–2.000 tấn/giờ tại Việt Nam.",
+        "",
+        "- Hotline / Zalo: 0912 712 772 (+84 912 712 772)",
+        "- Email: hieu@labcare.com.vn",
+        "- Văn phòng đại diện TP.HCM: 129 Ngô Đức Kế, phường Tam Thắng, Thành phố Hồ Chí Minh",
+        "- Trung tâm bảo hành trạm nghiền: phường Long Hương",
+        "- Ngôn ngữ nội dung: tiếng Việt. Báo giá theo công suất, loại đá và sản phẩm đầu ra.",
+        "",
+        "## Trang chính",
+        "",
+        item("Trang chủ", "/", "Tổng quan sản phẩm, giải pháp, dự án và câu hỏi thường gặp"),
+        item("Giới thiệu", "/gioithieu/", "Thông tin về Thanh Long JSC"),
+        item("Sản phẩm", "/san-pham/", "Danh mục thiết bị nghiền, sàng, làm cát, rửa cát"),
+        item("Giải pháp", "/giai-phap/", "Dây chuyền trọn gói theo sản phẩm đầu ra"),
+        item("Dịch vụ", "/dich-vu/", "Lắp đặt, bảo trì, sửa chữa, máy cũ"),
+        item("Báo giá", "/bao-gia/", "Gửi yêu cầu báo giá theo công suất"),
+        item("Liên hệ", "/lien-he/", "Hotline, email, địa chỉ văn phòng"),
+        "",
+    ]
+
+    group_names = {"thiet-bi": "Thiết bị", "giai-phap": "Giải pháp – dây chuyền",
+                   "du-an": "Dự án", "dich-vu": "Dịch vụ", "kien-thuc": "Kiến thức"}
+    products = [r for r in routes.values() if r["kind"] == "product"]
+    if products:
+        out += ["## Sản phẩm tiêu biểu", ""]
+        out += [item(r["title"], r["path"], r["product"].get("description", "")) for r in sorted(products, key=lambda r: r["path"])]
+        out.append("")
+
+    articles = defaultdict(list)
+    for r in routes.values():
+        if r["kind"] == "post" and r.get("index"):
+            articles[r["post"]["section"]].append(r["post"])
+    for parent, label in group_names.items():
+        keys = [k for k, s in SECTIONS.items() if s["parent"] == parent]
+        if not keys:
+            continue
+        heading = "Optional" if parent == "kien-thuc" else label
+        out += [f"## {heading}", ""]
+        if parent == "kien-thuc":
+            out += ["Bài viết kiến thức: kỹ thuật vận hành, cát nhân tạo, thị trường và giá.", ""]
+        for key in keys:
+            sec = SECTIONS[key]
+            out.append(item(sec["name"], sec["path"], sec.get("intro", "")))
+            for p in sorted(articles.get(key, []), key=lambda p: p["dt"], reverse=True):
+                out.append("  " + item(p["title"], p["path"], p.get("description", "")))
+        out.append("")
+
+    (SITE / "llms.txt").write_text("\n".join(out).rstrip() + "\n", encoding="utf-8")
+    print(f"llms.txt: {sum(len(v) for v in articles.values())} bài, {len(products)} sản phẩm")
+
+
 def main():
     rows, kept = load_audit()
     raw = pickle.load(open(ROOT / "tools" / "data" / "raw.pkl", "rb"))
@@ -1507,6 +1577,7 @@ def main():
     generate_404()
     (SITE / "robots.txt").write_text(
         "User-agent: *\nAllow: /\n\nSitemap: " + BASE + "/sitemap.xml\n", encoding="utf-8")
+    generate_llms_txt(routes, model)
 
     # ------------------------------------------------------------------
     # audit report

@@ -16,3 +16,6 @@
 # images may be replaced under the same name: cache 30 days
 /assets/img/*
   Cache-Control: public, max-age=2592000
+# llms.txt: Vietnamese Markdown, declare UTF-8
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
