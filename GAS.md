@@ -188,8 +188,9 @@ viết LẪN form Danh mục (kind `post` | `category`). Trang đích nhóm (là
    AI viết lại luôn Mô tả (bài) / Giới thiệu (danh mục) vào ô form, chỉ lên web khi Lưu. Bắt buộc ≥ 2 link nội
    bộ, chỉ từ danh sách trang thật (danh mục + bài, `smartLinkCandidates_`); link AI bịa bị gỡ (`usedPaths_`).
 2. **Viết bằng AI** (`Writer`): nút ở đầu form (chọn độ dài) → dàn ý (`smartOutline`) → sửa dàn ý → viết TỪNG
-   MỤC (`smartWriteSection`) → THAY nội dung ô soạn thảo (hỏi lại nếu đang có nội dung), KHÔNG tự Lưu. CHỈ khi tạo
-   mới: sửa bài thì ẩn nút (`#post-aiw-bar`); danh mục ẩn khi đã có nội dung/Smart content (`#category-aiw-bar`). "✨ Tạo bằng Smart content": popup nhập thông tin + ảnh → dàn ý → viết → chuyển Smart content luôn.
+   MỤC (`smartWriteSection`) → THAY nội dung ô soạn thảo (hỏi lại nếu đang có nội dung), KHÔNG tự Lưu. "✨ Tạo bằng
+   Smart content": popup nhập thông tin + ảnh → dàn ý → viết → chuyển Smart content luôn. Cả 2 nút CHỈ khi tạo mới
+   (chung thanh `#post-aiw-bar` / `#category-aiw-bar`): sửa bài thì ẩn; danh mục ẩn khi đã có nội dung/Smart content.
    Ảnh CHỈ từ ảnh đã có trong ô nội dung + ảnh tải lên ở popup (site không có thư viện ảnh). Không bịa số liệu.
 3. **Chấm điểm SEO kiểu Rank Math** (`gas/rank-math-seo-js.html`, `SeoChecker`): nút nổi "Điểm SEO" góc phải
    dưới, 38 tiêu chí 4 nhóm, điểm có trọng số, bộ đếm dưới Tiêu đề / Mô tả / Nội dung / Từ khoá / Tiêu đề SEO.
