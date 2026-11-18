@@ -19,8 +19,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const jsHtml = readFileSync(process.argv[2] || join(root, "gas/js.html"), "utf8");
 const appHtml = readFileSync(join(dirname(process.argv[2] || join(root, "gas/js.html")), "app.html"), "utf8");
 
+// index.html nạp các file này TRƯỚC js.html (bộ chấm điểm SEO, Smart content + Viết bài AI).
+const gasDir = dirname(process.argv[2] || join(root, "gas/js.html"));
+const preHtml = ["rank-math-seo-js.html", "smart-content-js.html"]
+  .map((f) => { try { return readFileSync(join(gasDir, f), "utf8"); } catch (e) { return ""; } }).join("\n");
 // Chỉ lấy các <script> inline (bỏ <script src=...> như TinyMCE).
-const inlineScripts = [...jsHtml.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+const inlineScripts = [...(preHtml + jsHtml).matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 if (!inlineScripts.length) {
   console.error("check_gas_client: không tìm thấy <script> inline nào trong js.html");
   process.exit(1);
@@ -118,6 +122,8 @@ function makeContext(lsSeed) {
     requestAnimationFrame: () => 0,
     Image: function () {},
     URL: { createObjectURL: () => "" },
+    DOMParser: function () { this.parseFromString = () => ({ body: fakeElement("body"), querySelectorAll: () => [], getElementById: () => fakeElement() }); },
+    Event: function () {},
     Promise, JSON, Math, Date, Object, Array, String, Number, Boolean, RegExp, Error, Map, Set,
   };
   window.document = document;
@@ -150,7 +156,8 @@ function lsSeedLoggedIn(role) {
 }
 
 // Mọi tab có trong app.html (data-tab="...") - mở thử từng tab sau khi tải xong.
-const tabs = [...new Set([...appHtml.matchAll(/data-tab="([^"]+)"/g)].map((m) => m[1]))];
+const tabs = [...new Set([...appHtml.matchAll(/data-tab="([^"]+)"/g)].map((m) => m[1])
+  .concat(["posts:", "posts:g", "categories:g"]))]; // thanh bên theo nhóm do renderNav_() vẽ
 
 const scenarios = [
   { name: "chưa đăng nhập", seed: {} },
@@ -173,7 +180,8 @@ for (const sc of scenarios) {
     for (const tab of tabs) step("switchTab('" + tab + "')", () => vm.runInContext("switchTab(" + JSON.stringify(tab) + ")", ctx));
     // Mở thử mọi form soạn/sửa (tạo mới + sửa bản ghi có sẵn).
     for (const call of ["openPostEditor(null)", "openGroupEditor(null)", "openGroupEditor('g')",
-      "openCategoryEditor(null)", "openCategoryEditor('cat-a')", "renderPostsTable()", "backToPostsList()"]) {
+      "openCategoryEditor(null)", "openCategoryEditor('cat-a')", "renderPostsTable()", "backToPostsList()",
+      "backToCategoriesList()", "SeoChecker.toggle(true)", "SeoChecker.toggle(false)", "Smart.renderBar('post')", "Smart.renderBar('category')"]) {
       step(call, () => vm.runInContext(call, ctx));
     }
   }

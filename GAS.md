@@ -1,7 +1,7 @@
 # GAS.md — CMS thegioimaynghienda.com (quyết định nghiệp vụ CHỐT)
 
 Đọc file này TRƯỚC khi sửa bất kỳ file nào trong `gas/` (`Code.js`, `index.html`, `app.html`,
-`css.html`, `js.html`). Theo playbook skill `free-cms-static-site-pipeline` (mẫu xevip).
+`css.html`, `js.html`, `rank-math-seo-js.html`, `smart-content-js.html`). Theo playbook skill `free-cms-static-site-pipeline` (mẫu xevip).
 Sửa code xong thì cập nhật lại file này trong cùng lượt sửa — file lệch code còn tệ hơn không có.
 
 ```
@@ -17,6 +17,8 @@ Phạm vi CMS (đúng yêu cầu: "quản lý đầy đủ các mục trên menu
 2. **Danh mục** — các mục con trong từng nhóm menu (trang danh mục /san-pham/may-nghien-da/…).
 3. **Bài viết** — toàn bộ 242 bài cũ (đã chuyển sang data/) + bài mới.
 4. **Người dùng** — ai được đăng nhập CMS.
+5. **Công cụ SEO** cho cả Bài viết lẫn Danh mục (mục XI): Viết bằng AI, Smart content, chấm điểm SEO kiểu
+   Rank Math + ô Từ khoá chính / Từ khoá phụ / Tiêu đề SEO.
 
 Ngoài phạm vi (KHÔNG quản lý qua CMS, sửa tay trong `html/`): trang chủ, Giới thiệu, Sản
 phẩm (/san-pham/ — danh sách máy), Dịch vụ (/dich-vu/), Báo giá, Liên hệ; 3 mục cố định trên
@@ -106,6 +108,12 @@ menu "Giới thiệu", "Liên hệ", "Báo giá" (nằm trong `tools/menu.py`).
 
 ## VII. UX chung
 
+- Thanh bên chia theo nhóm menu (vẽ từ `data/menu.json`, `renderNav_()` trong js.html): "Tất cả bài viết",
+  rồi mỗi nhóm 1 khu "Quản lý <nhóm>" gồm "Danh mục <nhóm>" (admin) + "Bài viết <nhóm>". Nhóm không có
+  danh mục riêng (danh mục duy nhất trùng trang đích, vd Dự án) chỉ có 1 mục "<Nhóm>" mở danh sách bài.
+  Cuối là khu "Hệ thống" (admin): Menu, Người dùng, AI (Gemini). Tab = `posts:<nhóm>` / `categories:<nhóm>`;
+  danh sách, bộ lọc và form mới mặc định theo nhóm đang xem (bài mới: danh mục đầu của nhóm; danh mục
+  mới: nhóm đó). Bài vẫn chuyển sang danh mục của nhóm khác được.
 - 2 modal riêng: XÁC NHẬN (Huỷ/Xoá) trước khi xoá; THÔNG BÁO kết quả (1 nút Đóng), không
   alert()/confirm(), không toast. Sau mỗi Lưu/Xoá: "Website sẽ được cập nhật sau 1-2 phút!".
 - Mọi nút async: spinner + disable, tự phục hồi khi lỗi. Lưu xong quay về danh sách của mục đó.
@@ -130,12 +138,18 @@ GitHub (repo site):
 | `data/posts.json` | index mọi bài `[{slug,title,description,section,date,modified,thumb,tags[],legacy_categories[]}]` | **có** |
 | `data/posts/<slug>.json` | 1 bài = các field trên + `content_html` | không |
 | `data/tags.json` | `{slug: tên hiển thị}` (mọi tag có trang) | không |
+| `data/categories/<key>.json` | `{key, content_html, smart}` — Nội dung danh mục + Smart content (mục XI). Ghi trước `menu.json` | không |
 | `data/redirects.json` | `{"/url-cu/": "/url-moi/"}` — 301 do CMS tạo (xoá bài/danh mục/nhóm) | không |
 | `html/assets/img/cms/` | ảnh CMS tải lên | không |
 
 Thứ tự ghi trong 1 thao tác: ảnh → chi tiết bài → tags.json / redirects.json → file trigger
 (`posts.json` hoặc `menu.json`) LUÔN SAU CÙNG.
 Độ trễ thật: Lưu → CI build (~1 phút) → Cloudflare deploy (~1 phút).
+
+Thêm (mục XI): bài viết (`data/posts/<slug>.json`) có thể có `seo_title`, `focus_keyword`, `keywords`,
+`smart`; `posts.json` có `smart: true` khi bài dùng Smart content. Danh mục trong `menu.json` có thể có
+`seo_title`, `focus_keyword`, `keywords`, `smart: true`. Ảnh trong Nội dung danh mục:
+`html/assets/img/cms/danh-muc/<URL danh mục nối gạch>/content-N.jpg` (xoá kèm khi xoá danh mục).
 
 `tools/export_cms_data.py` chỉ chạy 1 lần (đã chạy 18/11/2026) để chuyển dữ liệu từ bản scrape
 WordPress sang `data/`; từ nay `data/` là nguồn chân lý, không chạy lại (có chặn `--force`).
@@ -157,3 +171,38 @@ WordPress sang `data/`; từ nay `data/` là nguồn chân lý, không chạy l�
 - `GITHUB_REPO` = `thegioimaynghiencat`
 - `GITHUB_BRANCH` = `master`
 - `SPREADSHEET_ID` — không cần điền, tự tạo lần đầu.
+- `GEMINI_API_KEY`, `GEMINI_MODEL` — KHÔNG điền tay: admin nhập ở Hệ thống → AI (Gemini) (gọi thử rồi mới
+  lưu, chỉ hiện bản che; model trống = tự chọn bản Pro mới nhất key dùng được). `AI_USAGE` — số token đã dùng
+  theo tháng (code tự ghi, chỉ để theo dõi — Google tính tiền thẳng vào tài khoản Google của chủ key).
+
+## XI. Công cụ SEO: Viết bằng AI, Smart content, chấm điểm SEO (thêm 18/11/2026)
+
+Port từ adzo/techonline (mục II-D của các dự án đó), AI duy nhất là Google Gemini. Áp dụng cho CẢ form Bài
+viết LẪN form Danh mục (kind `post` | `category`). Trang đích nhóm (làm tay) không có.
+
+1. **Smart content** (`gas/smart-content-js.html`, `Smart`): AI dàn trang lại nội dung trong ô soạn thảo thành
+   HTML + CSS riêng (bảng, thẻ, quy trình, slider, hỏi đáp…); trình thiết kế xem trước bằng CSS thật của site
+   (máy tính/tablet/điện thoại), góp ý bằng cách bấm/bôi đen → "Nhờ AI sửa" (find/replace), 5 phiên bản.
+   Field `smart: {html, css, mode, instructions, versions[]}` lưu cùng nút Lưu (`cleanSmart_()` lọc
+   script/iframe/on*/style, ≤ ~600KB). `content_html` giữ nguyên làm bản gốc; "Bỏ Smart content" + Lưu = về bản gốc.
+   AI viết lại luôn Mô tả (bài) / Giới thiệu (danh mục) vào ô form, chỉ lên web khi Lưu. Bắt buộc ≥ 2 link nội
+   bộ, chỉ từ danh sách trang thật (danh mục + bài, `smartLinkCandidates_`); link AI bịa bị gỡ (`usedPaths_`).
+2. **Viết bằng AI** (`Writer`): nút ở đầu form (chọn độ dài) → dàn ý (`smartOutline`) → sửa dàn ý → viết TỪNG
+   MỤC (`smartWriteSection`) → THAY nội dung ô soạn thảo (hỏi lại nếu đang có nội dung), KHÔNG tự Lưu. Dùng cả
+   khi sửa. "✨ Tạo bằng Smart content": popup nhập thông tin + ảnh → dàn ý → viết → chuyển Smart content luôn.
+   Ảnh CHỈ từ ảnh đã có trong ô nội dung + ảnh tải lên ở popup (site không có thư viện ảnh). Không bịa số liệu.
+3. **Chấm điểm SEO kiểu Rank Math** (`gas/rank-math-seo-js.html`, `SeoChecker`): nút nổi "Điểm SEO" góc phải
+   dưới, 38 tiêu chí 4 nhóm, điểm có trọng số, bộ đếm dưới Tiêu đề / Mô tả / Nội dung / Từ khoá / Tiêu đề SEO.
+   Chạy hoàn toàn ở trình duyệt, không chặn Lưu; đang dùng Smart content thì chấm theo bản Smart content.
+   Danh mục: chấm Nội dung danh mục, Giới thiệu = mô tả, URL = phần slug cuối, bỏ tiêu chí riêng của bài.
+   Ô SEO: Từ khoá chính, Từ khoá phụ (chỉ để chấm điểm + gợi ý cho AI, build không in), Tiêu đề SEO (tuỳ
+   chọn; trống = "<Tiêu đề> | Thế Giới Máy Nghiền Đá", build bỏ đuôi khi > 65 ký tự).
+4. **Gọi Gemini**: client → `smartGenerate`/`smartRevise`/`smartOutline`/`smartWriteSection` → `aiJson_`
+   (generateContent, JSON theo schema, key ở header). Server không lưu gì ở bước gọi AI.
+5. **Build** (`tools/smart.py`, `tools/build.py`): có `smart.html` thì trang dùng nó thay nội dung gốc, bọc
+   `<div class="smc-root smc-a">`, nạp `/assets/css/smart.css` + `<style>` đã gắn phạm vi `.smc-a.smc-a.smc-a`
+   (gắn bằng `html/assets/js/smart-scope.js` chạy qua `node` — cùng file Admin nạp cho khung xem trước) +
+   `/assets/js/smart.js`. Bài Smart content không bị build chèn link nội bộ tự động. Nội dung danh mục
+   (hoặc bản Smart content của nó) hiện dưới danh sách bài ở trang 1 (`.sec-content`). Admin nạp
+   smart-scope.js / smart.css / smart.js / style.css từ https://thegioimaynghienda.com → sửa các file này phải
+   đưa site lên trước.

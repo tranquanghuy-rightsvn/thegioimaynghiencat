@@ -1,0 +1,193 @@
+/*
+ * Smart content (bài viết / mô tả sản phẩm thiết kế bằng AI — GAS.md II-D): nền chung + biến thiết kế.
+ * Lặp class .smc-root ba lần để thắng CSS của site (vd ".prose h2"); CSS riêng của
+ * từng bài được gắn ".smc-a" ba lần (js/smart-scope.js) và nạp SAU file này nên luôn thắng phần reset.
+ * Bài chỉ được dùng các biến --smc-* bên dưới cho màu/font -> màu luôn theo màu website
+ * (:root trong assets/css/style.css), đổi màu site là bài đổi theo.
+ */
+:root {
+  --smc-primary: var(--blue, #0059b1);
+  --smc-accent: var(--accent, #f7a600);
+  --smc-text: var(--text, #333);
+  --smc-bg: var(--white, #fff);
+  --smc-muted: color-mix(in srgb, var(--smc-text) 65%, var(--smc-bg));
+  --smc-surface: color-mix(in srgb, var(--smc-primary) 6%, var(--smc-bg));
+  --smc-border: color-mix(in srgb, var(--smc-text) 14%, var(--smc-bg));
+  --smc-radius: 8px;
+  --smc-font-heading: var(--f-head, inherit);
+  --smc-font-body: var(--f-body, inherit);
+}
+
+.smc-root.smc-root.smc-root {
+  /* Tính lại biến phái sinh NGAY TRÊN khung bài: màu riêng của bài (style="--smc-primary:..."
+     gắn trên .smc-root) mới tác động được tới chúng; khai báo ở :root thì đã tính xong theo màu web. */
+  --smc-muted: color-mix(in srgb, var(--smc-text) 65%, var(--smc-bg));
+  --smc-surface: color-mix(in srgb, var(--smc-primary) 6%, var(--smc-bg));
+  --smc-border: color-mix(in srgb, var(--smc-text) 14%, var(--smc-bg));
+  display: block;
+  box-sizing: border-box;
+  container: smc / inline-size;
+  color: var(--smc-text);
+  font-family: var(--smc-font-body);
+  line-height: 1.65;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+.smc-root.smc-root.smc-root *,
+.smc-root.smc-root.smc-root *::before,
+.smc-root.smc-root.smc-root *::after {
+  box-sizing: border-box;
+}
+
+.smc-root.smc-root.smc-root :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, dl, dt, dd, figure, figcaption, blockquote, table, caption, thead, tbody, tr, th, td, details, summary, hr, pre, section, article, header, footer, aside, nav, div, span, a, button, img, picture, video, small, label, time, cite) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  text-shadow: none;
+  float: none;
+  max-width: none;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  text-indent: 0;
+  text-align: inherit;
+  list-style: none;
+  quotes: none;
+}
+
+.smc-root.smc-root.smc-root :where(h1, h2, h3, h4, h5, h6, p, li, a, blockquote, summary, td, th, div, span)::before,
+.smc-root.smc-root.smc-root :where(h1, h2, h3, h4, h5, h6, p, li, a, blockquote, summary, td, th, div, span)::after {
+  content: none;
+}
+
+.smc-root.smc-root.smc-root :where(img, video) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.smc-root.smc-root.smc-root :where(svg) {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  flex: none;
+}
+
+.smc-root.smc-root.smc-root :where(table) {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.smc-root.smc-root.smc-root :where(button) {
+  appearance: none;
+  cursor: pointer;
+  line-height: inherit;
+}
+
+.smc-root.smc-root.smc-root :where(summary) {
+  cursor: pointer;
+}
+
+.smc-root.smc-root.smc-root [hidden] {
+  display: none !important;
+}
+
+/* Slider: khung trượt ngang, bài tự quyết định phần còn lại. */
+.smc-root.smc-root.smc-root :where([data-smc-track]) {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.smc-root.smc-root.smc-root :where([data-smc-track])::-webkit-scrollbar {
+  display: none;
+}
+
+.smc-root.smc-root.smc-root :where([data-smc-track] > *) {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+
+.smc-root.smc-root.smc-root :where([data-smc-zoom], [data-smc-video]) {
+  cursor: pointer;
+}
+
+.smc-root.smc-root.smc-root :where([data-smc-video]) > :where(iframe, video) {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
+/* Trình xem ảnh phóng to (nằm ngoài bài, gắn vào body). */
+.smc-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+.smc-lb img {
+  max-width: 94vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.smc-lb button {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font: 400 26px/44px system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.smc-lb button:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.smc-lb .smc-lb-close {
+  top: 16px;
+  right: 16px;
+}
+
+.smc-lb .smc-lb-prev {
+  left: 16px;
+  top: 50%;
+  margin-top: -22px;
+}
+
+.smc-lb .smc-lb-next {
+  right: 16px;
+  top: 50%;
+  margin-top: -22px;
+}
+
+.smc-lb .smc-lb-count {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.75);
+  font: 400 14px/1 system-ui, sans-serif;
+}

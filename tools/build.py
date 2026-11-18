@@ -36,10 +36,12 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 
+import smart as smart_mod  # tools/smart.py - Smart content rendering
+
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261115a"
+CSS_VER = "20261118a"
 JS_VER = "20261115b"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
@@ -453,7 +455,9 @@ def add_tracking(page_html: str) -> str:
 def page_shell(*, path: str, title: str, description: str, canonical: str,
                body: str, nav: str, jsonld: list | None = None,
                noindex: bool = False, og_type: str = "website",
-               image: str = "", published: str = "", modified: str = "") -> str:
+               image: str = "", published: str = "", modified: str = "",
+               extra_head: str = "", extra_body: str = "") -> str:
+    """extra_head / extra_body: tags for pages that show Smart content (tools/smart.py)."""
     rel_path = output_path(path)
     depth = depth_of(rel_path)
     parts = layout_blocks()
@@ -498,7 +502,7 @@ def page_shell(*, path: str, title: str, description: str, canonical: str,
   <meta name="twitter:image" content="{esc(og_image)}">
   <meta name="theme-color" content="#0059b1">
   {ICON_LINKS}
-  <link rel="stylesheet" href="{'../' * depth}assets/css/style.css?v={CSS_VER}">
+  <link rel="stylesheet" href="{'../' * depth}assets/css/style.css?v={CSS_VER}">{extra_head}
   {ld}
 </head>
 <body id="top" data-page="{esc(nav)}">
@@ -510,7 +514,7 @@ def page_shell(*, path: str, title: str, description: str, canonical: str,
 
 {footer}
 
-  <script src="{'../' * depth}assets/js/main.js?v={JS_VER}" defer></script>
+  <script src="{'../' * depth}assets/js/main.js?v={JS_VER}" defer></script>{extra_body}
 </body>
 </html>
 """
@@ -1155,7 +1159,8 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
                   canonical: str, title: str, description: str,
                   nav: str, noindex: bool, item_label: str = "bài viết",
                   lead_html: str = "", hide_empty: bool = False,
-                  current_section: str | None = None, total_items: int | None = None) -> str:
+                  current_section: str | None = None, total_items: int | None = None,
+                  after_html: str = "", extra_head: str = "", extra_body: str = "") -> str:
     cards = "\n          ".join(post_card(p, from_dir) for p in posts)
     empty = '<p class="list-empty" hidden>Không tìm thấy bài viết phù hợp.</p>'
     if not posts:
@@ -1181,7 +1186,7 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
           {cards}
         </div>
         {empty}
-        {pager}
+        {pager}{after_html}
       </div>
         {sidebar(from_dir, current_section)}
       </div>
@@ -1206,7 +1211,8 @@ def archive_page(*, base_path: str, page_no: int, total_pages: int, h1: str,
     ]
     return page_shell(path=base_path if page_no == 1 else page_url(base_path, page_no),
                       title=title, description=description, canonical=canonical,
-                      body=body, nav=nav, jsonld=jsonld, noindex=noindex)
+                      body=body, nav=nav, jsonld=jsonld, noindex=noindex,
+                      extra_head=extra_head, extra_body=extra_body)
 
 
 # ---------------------------------------------------------------------------
@@ -1756,18 +1762,21 @@ def write_redirects(rows, routes, extra=None):
 def generate_article(path, post, model, by_section, routes):
     from_dir = page_dir(path)
     image_map = model["image_map"]
-    if post.get("content_html") is not None:
+    smart = post.get("smart_render")
+    if smart:
+        body_html = cms_body(smart[0], from_dir)
+    elif post.get("content_html") is not None:
         body_html = cms_body(post["content_html"], from_dir)
     else:
         body_html = sanitize(post["node"], from_dir=from_dir, model=model, image_map=image_map, post=post)
     if not body_html:
         body_html = f"<p>{esc(post['description'] or post['title'])}</p><p>Nội dung chi tiết đang được cập nhật. Quý khách cần tư vấn cấu hình, vui lòng gọi <a href=\"tel:0912712772\">0912 712 772</a>.</p>"
-    if "<img" not in body_html and post["thumb"]:
+    if not smart and "<img" not in body_html and post["thumb"]:
         size = image_size(post["thumb"]) or ("", "")
         dims = f' width="{size[0]}" height="{size[1]}"' if size[0] else ""
         body_html = (f'<figure><img src="{esc(rel_url(from_dir, post["thumb"]))}" alt="{esc(post["title"])}"{dims} '
                      f'loading="lazy" decoding="async"><figcaption>{esc(post["title"])}</figcaption></figure>' + body_html)
-    if post["is_primary"]:
+    if post["is_primary"] and not smart:
         body_html = add_internal_links(body_html, path, from_dir, routes, post["section"])
 
     sec_key = post["section"]
@@ -1844,12 +1853,15 @@ def generate_article(path, post, model, by_section, routes):
          "mainEntityOfPage": {"@type": "WebPage", "@id": canonical}},
     ]
     noindex = (not post["is_primary"]) or (not post["is_article"])
-    page_title = post["title"] + " | Thế Giới Máy Nghiền Đá"
+    page_title = post.get("seo_title") or post["title"] + TITLE_SUFFIX
+    depth = depth_of(output_path(path))
     write_page(path, page_shell(path=path, title=page_title, description=desc,
                                 canonical=canonical, body=body, nav=MENU_BY_KEY[sec["parent"]][3],
                                 jsonld=jsonld, noindex=noindex, og_type="article",
                                 image=post["thumb"],
-                                published=dt.isoformat() if dt else "", modified=post["modified"]))
+                                published=dt.isoformat() if dt else "", modified=post["modified"],
+                                extra_head=("\n  " + smart_mod.head_tags(smart[1], depth)) if smart else "",
+                                extra_body=("\n  " + smart_mod.body_tags(depth)) if smart else ""))
 
 
 # ---------------------------------------------------------------------------
@@ -2190,13 +2202,28 @@ def generate_section(key, members, total, model):
         if n > 1:
             cr.append((f"Trang {n}", None))
         title = sec["name"] if n == 1 else f"{sec['name']} – Trang {n}"
+        # Category content (CMS "Nội dung danh mục", optionally Smart content) - page 1 only,
+        # under the article list.
+        after, x_head, x_body = "", "", ""
+        if n == 1:
+            depth = depth_of(output_path(page_path))
+            smart = sec.get("smart_render")
+            content = smart[0] if smart else sec.get("content_html", "")
+            content = cms_body(content, from_dir) if content.strip() else ""
+            if content:
+                after = f'\n        <div class="article__body prose sec-content reveal">{content}</div>'
+            if smart:
+                x_head = "\n  " + smart_mod.head_tags(smart[1], depth)
+                x_body = "\n  " + smart_mod.body_tags(depth)
+        page_title = (sec.get("seo_title") or title + TITLE_SUFFIX) if n == 1 else title + TITLE_SUFFIX
         write_page(page_path, archive_page(
             base_path=base, page_no=n, total_pages=total, h1=title,
             intro=esc(sec["intro"]) if n == 1 else f"Tiếp tục danh sách {esc(sec['name'].lower())} – trang {n}/{total}.",
             posts=chunk, from_dir=from_dir, crumbs_items=cr,
-            canonical=BASE + page_path, title=title + " | Thế Giới Máy Nghiền Đá",
+            canonical=BASE + page_path, title=page_title,
             description=sec["intro"], nav=nav, noindex=n > 1,
-            lead_html=lead, hide_empty=bool(lead), current_section=key, total_items=len(members)))
+            lead_html=lead, hide_empty=bool(lead), current_section=key, total_items=len(members),
+            after_html=after, extra_head=x_head, extra_body=x_body))
 
 
 def generate_solutions_landing(section_pages):
@@ -2549,14 +2576,22 @@ def load_cms_config():
         if c["path"] in seen_paths:
             raise SystemExit(f"data/menu.json: '{c['key']}' trùng URL {c['path']} với '{seen_paths[c['path']]}'")
         seen_paths[c["path"]] = c["key"]
+        detail = DATA / "categories" / f"{c['key']}.json"
+        detail = json.loads(detail.read_text(encoding="utf-8")) if detail.exists() else {}
         SECTIONS[c["key"]] = {"parent": c["parent"], "name": c["name"], "path": c["path"],
                               "intro": c.get("intro", ""), "products": c.get("products", []),
-                              "capacity": bool(c.get("capacity"))}
+                              "capacity": bool(c.get("capacity")),
+                              "seo_title": (c.get("seo_title") or "").strip(),
+                              "content_html": detail.get("content_html", ""),
+                              "smart": detail.get("smart")}
         if c.get("flow"):
             SECTION_FLOWS[c["key"]] = [tuple(x) for x in c["flow"]]
         if c.get("project_kw"):
             SECTION_PROJECT_KW[c["key"]] = list(c["project_kw"])
     SECTION_BY_PATH = {v["path"]: k for k, v in SECTIONS.items()}
+    rendered = smart_mod.render_many({k: v["smart"] for k, v in SECTIONS.items()})
+    for k, v in SECTIONS.items():
+        v["smart_render"] = rendered.get(k)
     MOVED_SECTIONS = load_data("redirects.json") if (DATA / "redirects.json").exists() else {}
 
 
@@ -2584,7 +2619,11 @@ def load_cms_model(kept):
             "categories_data": [{"slug": c} for c in d.get("legacy_categories", [])],
             "primary_cat": "tin-tuc", "is_primary": True, "primary_path": path, "is_article": bool(dt),
             "content_html": d.get("content_html", ""), "node": None, "order": i,
+            "seo_title": (d.get("seo_title") or "").strip(), "smart": d.get("smart"),
         }
+    rendered = smart_mod.render_many({k: v["smart"] for k, v in posts.items()})
+    for k, v in posts.items():
+        v["smart_render"] = rendered.get(k)
     primary = sorted([p for p in posts.values() if p["is_article"]], key=lambda p: (-p["dt"].timestamp(), p["order"]))
     kept_paths = {k["path"] for k in kept} | {v["path"] for v in SECTIONS.values()} | {"/giai-phap/"}
     kept_paths |= {f"/tag/{t}/" for t in tag_names}

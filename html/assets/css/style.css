@@ -895,6 +895,7 @@ body.is-locked { overflow: hidden; }
 .intro-note { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 26px; padding: 14px 18px; background: var(--blue-light); border-left: 4px solid var(--blue-2); border-radius: 3px; color: #444; }
 .intro-note .ico { flex: none; width: 22px; height: 22px; margin-top: 1px; color: var(--blue-2); }
 .intro-note p { margin: 0; line-height: 1.65; }
+.sec-content { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--line); }
 .intro-note b { color: var(--title); }
 /* article pages: text 3/4 left, section sidebar 1/4 right */
 .with-side > .article-wrap { max-width: none; margin: 0; }
