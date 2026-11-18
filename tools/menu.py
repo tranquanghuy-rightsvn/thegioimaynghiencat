@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Ghi menu chính (máy tính + điện thoại) và cột "Menu" ở chân trang vào html/index.html
-từ MENU / SECTIONS trong tools/build.py. Sau đó chạy tools/sync-layout.py rồi tools/build.py.
+từ data/menu.json (qua tools/build.py). tools/build.py tự gọi bước này mỗi lần build.
 """
 import html
 import re
@@ -18,7 +18,7 @@ def rel(path):  # links in index.html are written for the site root
 
 
 def children(key):
-    items = [(n, p) for n, p in build.SERVICE_LINKS] if key == "dich-vu" else []
+    items = list(build.GROUP_LINKS.get(key, []))
     items += [(v["name"], v["path"]) for _, v in build.section_children(key)]
     return [(html.escape(n), p) for n, p in items]
 
@@ -27,6 +27,7 @@ def desktop():
     # no "Trang chủ" on desktop: the logo links home and the bar must fit 1200px
     out = ['            <li><a data-nav="gioithieu" href="gioithieu/">Giới thiệu</a></li>']
     for key, label, landing, nav in build.MENU:
+        label = html.escape(label)
         sub = children(key)
         if not sub:
             out.append(f'            <li><a data-nav="{nav}" href="{rel(landing)}">{label}</a></li>')
@@ -46,6 +47,7 @@ def mobile():
     out = ['        <li><a data-nav="home" href="./">Trang chủ</a></li>',
            '        <li><a data-nav="gioithieu" href="gioithieu/">Giới thiệu</a></li>']
     for key, label, landing, nav in build.MENU:
+        label = html.escape(label)
         sub = children(key)
         if not sub:
             out.append(f'        <li><a data-nav="{nav}" href="{rel(landing)}">{label}</a></li>')
@@ -65,7 +67,7 @@ def mobile():
 def footer():
     items = [("Trang chủ", "/"), ("Giới thiệu", "/gioithieu/")] + [(m[1], m[2]) for m in build.MENU] + \
             [("Báo giá", "/bao-gia/"), ("Liên hệ", "/lien-he/")]
-    return "\n".join(f'          <li><a href="{rel(p)}">{n}</a></li>' for n, p in items)
+    return "\n".join(f'          <li><a href="{rel(p)}">{html.escape(n)}</a></li>' for n, p in items)
 
 
 def main():
@@ -83,4 +85,5 @@ def main():
 
 
 if __name__ == "__main__":
+    build.load_cms_config()
     main()

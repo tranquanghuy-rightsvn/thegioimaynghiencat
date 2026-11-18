@@ -20,3 +20,10 @@
 # llms.txt: Vietnamese Markdown, declare UTF-8
 /llms.txt
   Content-Type: text/plain; charset=utf-8
+# admin: never indexed (not listed in robots.txt on purpose: it would advertise the path)
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: no-cache
+# self-hosted editor for the admin page
+/vendor/*
+  Cache-Control: public, max-age=2592000

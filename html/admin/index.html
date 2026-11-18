@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trang quản trị - Thế Giới Máy Nghiền Đá</title>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<!-- Trang quản trị: nhúng CMS vào domain của site. File tĩnh, sửa tay (build không sinh lại).
+     Quá 12 giây không tải được thì hiện nút mở trang quản trị ở tab riêng. -->
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; background: #f5f6f8;
+               font-family: "Open Sans", "Segoe UI", sans-serif; color: #1c1c1c; }
+  /* Chiều cao thanh cảnh báo của Google, đo thật 27/08/2026. Google đổi giao diện thì sửa
+     đúng 1 con số này. */
+  :root { --gg-warning-height: 25px; }
+
+  .cms-viewport { position: fixed; inset: 0; overflow: hidden; }
+  .cms-frame {
+    position: absolute;
+    top: calc(var(--gg-warning-height) * -1);
+    left: 0;
+    width: 100%;
+    height: calc(100% + var(--gg-warning-height));
+    border: 0;
+    display: block;
+  }
+
+  /* Lớp phủ báo trạng thái. Bản trước để z-index âm nên khi iframe treo thì người dùng chỉ
+     thấy màn hình trắng, không biết chuyện gì - lần này nằm ĐÈ LÊN và tự ẩn khi iframe tải
+     xong thật. */
+  .cms-status {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    padding: 24px; background: #f5f6f8;
+  }
+  .cms-status.hidden { display: none; }
+  .cms-status h2 { font-size: 18px; margin: 0 0 8px; }
+  .cms-status p { font-size: 14px; color: #666; margin: 6px 0; line-height: 1.6; }
+  .cms-status a {
+    display: inline-block; margin-top: 14px; padding: 10px 18px; border-radius: 6px;
+    background: #0059b1; color: #fff; text-decoration: none; font-weight: 600;
+  }
+  .spinner {
+    width: 32px; height: 32px; margin: 0 auto 16px;
+    border: 3px solid rgba(0,0,0,.1); border-top-color: #0059b1; border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="cms-status" id="cms-status">
+  <div>
+    <div class="spinner" id="cms-spinner"></div>
+    <h2 id="cms-status-title">Đang mở trang quản trị...</h2>
+    <p id="cms-status-text">Nếu quá 12 giây vẫn chưa vào được, dùng nút bên dưới.</p>
+    <a id="cms-open-tab" href="#" rel="nofollow noreferrer" style="display:none">Mở ở tab riêng</a>
+  </div>
+</div>
+
+<div class="cms-viewport">
+  <iframe class="cms-frame" id="cms-frame" title="Trang quản trị" referrerpolicy="no-referrer"></iframe>
+</div>
+
+<script>
+  var CMS_URL = 'https://script.google.com/macros/s/AKfycby7QaU0nhO_B4xc99lwE_wxYOoKiQp0BXu5caJreWKphm2MPllH_hz2yRFNHBSOfCE/exec';
+
+  var frame = document.getElementById('cms-frame');
+  var statusBox = document.getElementById('cms-status');
+  var loaded = false;
+
+  // Nút thoát hiểm mở THẲNG URL /exec thật - không qua trang/route trung gian nào khác.
+  document.getElementById('cms-open-tab').href = CMS_URL;
+
+  // Sự kiện load của iframe VẪN bắn kể cả khi nội dung khác origin (chỉ là không đọc được
+  // bên trong) - đủ để phân biệt "đã tải được" với "treo".
+  frame.addEventListener('load', function () {
+    loaded = true;
+    statusBox.classList.add('hidden');
+    console.log('[admin] nhúng thành công');
+  });
+
+  // Treo quá lâu -> hiện lối thoát, không để người dùng nhìn màn hình trắng.
+  setTimeout(function () {
+    if (loaded) return;
+    console.warn('[admin] không nhúng được sau 12 giây - hiện link mở thẳng URL /exec');
+    document.getElementById('cms-spinner').style.display = 'none';
+    document.getElementById('cms-status-title').textContent = 'Không nhúng được trang quản trị';
+    document.getElementById('cms-status-text').textContent =
+      'Trình duyệt này không cho hiển thị trang quản trị bên trong website. Bấm nút bên dưới để mở theo cách thường.';
+    document.getElementById('cms-open-tab').style.display = 'inline-block';
+  }, 12000);
+
+  frame.src = CMS_URL;
+</script>
+</body>
+</html>

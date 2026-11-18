@@ -1,0 +1,55 @@
+# Build html/ from data/ whenever the CMS finishes a save.
+# Triggered ONLY by the files the CMS always writes last in an operation (posts.json for
+# articles, menu.json for menu groups / categories), never by data/** - an operation makes
+# several commits (images, article, tags...) and building on the first one would deploy a
+# half-done state. The commit made here touches html/ only, so it does not re-trigger.
+name: Build site from CMS data
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - data/posts.json
+      - data/menu.json
+  workflow_dispatch:
+
+concurrency:
+  group: build-site
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: pip install beautifulsoup4==4.14.3 lxml pillow
+
+      - name: Build html/ from data/
+        run: python3 tools/build.py
+
+      - name: Commit and push html/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898900+github-actions[bot]@users.noreply.github.com"
+          git add -A html
+          if git diff --cached --quiet; then
+            echo "Không có thay đổi"
+            exit 0
+          fi
+          git commit -m "CI: build html from data"
+          for i in 1 2 3; do
+            git pull --rebase origin master && git push origin HEAD:master && exit 0
+            sleep 5
+          done
+          exit 1

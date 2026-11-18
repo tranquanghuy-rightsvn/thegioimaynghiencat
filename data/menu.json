@@ -1,0 +1,418 @@
+{
+  "groups": [
+    {
+      "key": "thiet-bi",
+      "label": "Thiết bị",
+      "landing": "/san-pham/",
+      "nav": "san-pham",
+      "base": "/san-pham/",
+      "order": 1,
+      "builtin": true,
+      "intro": "",
+      "links": []
+    },
+    {
+      "key": "giai-phap",
+      "label": "Giải pháp",
+      "landing": "/giai-phap/",
+      "nav": "giai-phap",
+      "base": "/giai-phap/",
+      "order": 2,
+      "builtin": true,
+      "intro": "",
+      "links": []
+    },
+    {
+      "key": "du-an",
+      "label": "Dự án",
+      "landing": "/du-an/",
+      "nav": "du-an",
+      "base": "/du-an/",
+      "order": 3,
+      "builtin": true,
+      "intro": "",
+      "links": []
+    },
+    {
+      "key": "dich-vu",
+      "label": "Dịch vụ",
+      "landing": "/dich-vu/",
+      "nav": "dich-vu",
+      "base": "/dich-vu/",
+      "order": 4,
+      "builtin": true,
+      "intro": "",
+      "links": [
+        {
+          "name": "Lắp đặt & chuyển giao",
+          "path": "/dich-vu/"
+        }
+      ]
+    },
+    {
+      "key": "kien-thuc",
+      "label": "Kiến thức",
+      "landing": "/nhan-bao-gia/",
+      "nav": "tin-tuc",
+      "base": "/kien-thuc/",
+      "order": 5,
+      "builtin": true,
+      "intro": "",
+      "links": []
+    }
+  ],
+  "categories": [
+    {
+      "key": "tb-nghien-da",
+      "parent": "thiet-bi",
+      "name": "Máy nghiền đá",
+      "path": "/san-pham/may-nghien-da/",
+      "intro": "Máy nghiền hàm, nghiền côn, phản kích và nghiền búa cho dây chuyền đá xây dựng 50 – 2.000 tấn/giờ: nghiền thô, nghiền trung và nghiền mịn theo loại đá và sản phẩm đầu ra. Kèm sàng rung phân loại, máy cấp liệu và thông tin máy nghiền, trạm nghiền cũ, thanh lý.",
+      "order": 1,
+      "products": [
+        "Máy nghiền hàm",
+        "Máy nghiền côn",
+        "Máy nghiền phản kích",
+        "Máy nghiền búa",
+        "Sàng rung phân loại"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "nghiền đá",
+        "đá"
+      ]
+    },
+    {
+      "key": "tb-lam-cat",
+      "parent": "thiet-bi",
+      "name": "Máy làm cát nhân tạo VSI",
+      "path": "/san-pham/may-lam-cat/",
+      "intro": "Máy làm cát VSI vo đá ra cát hạt khối, tỷ lệ cát 35 – 50%, tiền điện chỉ khoảng 3.750 đồng mỗi khối cát. Nghiền đá, sỏi sông, đá cát kết thành cát xây dựng.",
+      "order": 2,
+      "products": [
+        "Máy làm cát VSI"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "cát",
+        "0x4"
+      ]
+    },
+    {
+      "key": "tb-rua-cat",
+      "parent": "thiet-bi",
+      "name": "Máy rửa cát & thu hồi cát mịn",
+      "path": "/san-pham/may-rua-cat/",
+      "intro": "Máy rửa cát dạng guồng, máy tách cát mịn thu hồi hạt 0,16 – 3 mm, hệ thống rửa cát UltraWash của McLanahan và máy ép bùn xử lý nước thải sau rửa.",
+      "order": 3,
+      "products": [
+        "Máy rửa cát dạng guồng",
+        "Máy tách cát mịn",
+        "Máy rửa cát McLanahan",
+        "Máy ép bùn"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "rửa cát"
+      ]
+    },
+    {
+      "key": "tb-di-dong",
+      "parent": "thiet-bi",
+      "name": "Trạm nghiền di động",
+      "path": "/san-pham/tram-nghien-di-dong/",
+      "intro": "Trạm nghiền di động không cần móng, di chuyển theo mỏ và công trường: phù hợp mỏ đá trữ lượng nhỏ, rải rác, khu công nghiệp và nghiền tái chế tại chỗ.",
+      "order": 4,
+      "products": [
+        "Trạm nghiền di động"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "nghiền đá"
+      ]
+    },
+    {
+      "key": "tb-tuyen-quang",
+      "parent": "thiet-bi",
+      "name": "Thiết bị tuyển quặng",
+      "path": "/san-pham/thiet-bi-tuyen-quang/",
+      "intro": "Máy nghiền bi nghiền mịn quặng, khoáng sản và thiết bị tuyển từ, phân cấp cho trạm tuyển quặng sắt.",
+      "order": 5,
+      "products": [
+        "Máy nghiền bi"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "quặng"
+      ]
+    },
+    {
+      "key": "tb-sang-phu-tung",
+      "parent": "thiet-bi",
+      "name": "Phụ tùng SKF",
+      "path": "/san-pham/phu-tung-skf/",
+      "intro": "Vòng bi SKF chính hãng cho máy nghiền, sàng rung: bạc đạn cầu rãnh sâu, đũa côn, tang trống và gối đỡ SNL, SY.",
+      "order": 6,
+      "products": [
+        "Bạc đạn cầu rãnh sâu",
+        "Bạc đạn đũa côn",
+        "Bạc đạn tang trống",
+        "Gối đỡ vòng bi SKF"
+      ],
+      "capacity": false,
+      "flow": [],
+      "project_kw": [
+        "nghiền đá"
+      ]
+    },
+    {
+      "key": "gp-nghien-da",
+      "parent": "giai-phap",
+      "name": "Dây chuyền nghiền đá xây dựng",
+      "path": "/giai-phap/day-chuyen-nghien-da/",
+      "intro": "Dây chuyền nghiền sàng đá 1x2, 4x6, đá cấp phối, đá mi từ 50 đến 2.000 tấn/giờ, cung cấp trọn gói chìa khóa trao tay từ khảo sát mỏ, thiết kế, lắp đặt đến chuyển giao vận hành.",
+      "order": 1,
+      "products": [
+        "Dây chuyền nghiền đồng bộ"
+      ],
+      "capacity": true,
+      "flow": [],
+      "project_kw": [
+        "nghiền đá",
+        "đá"
+      ]
+    },
+    {
+      "key": "gp-cat-nhan-tao",
+      "parent": "giai-phap",
+      "name": "Dây chuyền sản xuất cát nhân tạo",
+      "path": "/giai-phap/day-chuyen-cat-nhan-tao/",
+      "intro": "Dây chuyền làm cát nhân tạo từ đá, sỏi sông, sỏi đồi và đá cát kết: nghiền, vo hạt bằng máy VSI, sàng phân loại, rửa và thu hồi cát mịn đạt tiêu chuẩn cát xây dựng.",
+      "order": 2,
+      "products": [
+        "Dây chuyền cát nhân tạo",
+        "Máy làm cát VSI"
+      ],
+      "capacity": false,
+      "flow": [
+        [
+          "Cấp liệu",
+          "Cấp liệu rung"
+        ],
+        [
+          "Nghiền thô",
+          "Máy nghiền hàm"
+        ],
+        [
+          "Nghiền trung",
+          "Máy nghiền côn"
+        ],
+        [
+          "Làm cát",
+          "Máy VSI"
+        ],
+        [
+          "Sàng phân loại",
+          "Sàng rung"
+        ],
+        [
+          "Rửa cát",
+          "Guồng / trục vít"
+        ],
+        [
+          "Thu hồi cát mịn",
+          "Máy tách cát mịn"
+        ]
+      ],
+      "project_kw": [
+        "cát",
+        "0x4"
+      ]
+    },
+    {
+      "key": "gp-rua-cat",
+      "parent": "giai-phap",
+      "name": "Dây chuyền rửa cát",
+      "path": "/giai-phap/day-chuyen-rua-cat/",
+      "intro": "Hệ thống rửa cát đồi, cát biển, cát lẫn cao lanh thành cát sạch: sàng rửa, guồng rửa, thu hồi cát mịn và xử lý nước thải, ép bùn để tuần hoàn nước.",
+      "order": 3,
+      "products": [
+        "Máy rửa cát dạng guồng",
+        "Máy tách cát mịn",
+        "Máy ép bùn"
+      ],
+      "capacity": false,
+      "flow": [
+        [
+          "Cấp liệu",
+          "Phễu, băng tải"
+        ],
+        [
+          "Sàng, xịt rửa",
+          "Sàng rung có vòi phun"
+        ],
+        [
+          "Rửa cát",
+          "Guồng / trục vít"
+        ],
+        [
+          "Tách nước",
+          "Sàng rung tách nước"
+        ],
+        [
+          "Thu hồi cát mịn",
+          "Máy tách cát mịn"
+        ],
+        [
+          "Xử lý nước, bùn",
+          "Bể lắng, máy ép bùn"
+        ]
+      ],
+      "project_kw": [
+        "rửa cát"
+      ]
+    },
+    {
+      "key": "gp-tuyen-quang",
+      "parent": "giai-phap",
+      "name": "Dây chuyền tuyển quặng sắt",
+      "path": "/giai-phap/day-chuyen-tuyen-quang/",
+      "intro": "Trạm nghiền, nghiền bi và tuyển từ quặng sắt: loại bỏ tạp chất, nâng hàm lượng quặng tinh cho mỏ quặng sắt, mangan và khoáng sản kim loại.",
+      "order": 4,
+      "products": [
+        "Dây chuyền nghiền quặng thô",
+        "Máy nghiền bi"
+      ],
+      "capacity": false,
+      "flow": [
+        [
+          "Nghiền thô",
+          "Máy nghiền hàm"
+        ],
+        [
+          "Nghiền trung",
+          "Máy nghiền côn"
+        ],
+        [
+          "Nghiền mịn",
+          "Máy nghiền bi"
+        ],
+        [
+          "Phân cấp",
+          "Thiết bị phân cấp"
+        ],
+        [
+          "Tuyển từ",
+          "Máy tuyển từ"
+        ],
+        [
+          "Quặng tinh",
+          "Tách nước, lưu kho"
+        ]
+      ],
+      "project_kw": [
+        "quặng"
+      ]
+    },
+    {
+      "key": "gp-tai-che",
+      "parent": "giai-phap",
+      "name": "Tái chế bê tông, phế thải xây dựng",
+      "path": "/giai-phap/tai-che-phe-thai-xay-dung/",
+      "intro": "Nghiền tái chế bê tông, gạch đá thải từ công trường thành cốt liệu: giảm chi phí vận chuyển, đổ thải và tận dụng lại vật liệu ngay tại chỗ.",
+      "order": 5,
+      "products": [
+        "Trạm nghiền di động"
+      ],
+      "capacity": false,
+      "flow": [
+        [
+          "Phân loại phế thải",
+          "Loại bỏ tạp chất"
+        ],
+        [
+          "Nghiền",
+          "Trạm nghiền di động"
+        ],
+        [
+          "Tách sắt thép",
+          "Máy tách từ"
+        ],
+        [
+          "Sàng phân loại",
+          "Sàng rung"
+        ],
+        [
+          "Cốt liệu tái chế",
+          "Theo cỡ hạt yêu cầu"
+        ]
+      ],
+      "project_kw": []
+    },
+    {
+      "key": "du-an",
+      "parent": "du-an",
+      "name": "Dự án",
+      "path": "/du-an/",
+      "intro": "Trạm nghiền đá, dây chuyền cát nhân tạo và trạm tuyển quặng Thanh Long JSC đã cung cấp, lắp đặt, chạy thử và bàn giao cho khách hàng.",
+      "order": 1,
+      "products": [],
+      "capacity": false,
+      "flow": [],
+      "project_kw": []
+    },
+    {
+      "key": "dv-bao-tri",
+      "parent": "dich-vu",
+      "name": "Bảo trì, sửa chữa",
+      "path": "/dich-vu/bao-tri-sua-chua/",
+      "intro": "Bảo trì định kỳ, sửa chữa, xử lý sự cố và thay thế vật tư cho máy nghiền hàm, nghiền côn, máy làm cát và trạm nghiền.",
+      "order": 1,
+      "products": [],
+      "capacity": false,
+      "flow": [],
+      "project_kw": []
+    },
+    {
+      "key": "kt-ky-thuat",
+      "parent": "kien-thuc",
+      "name": "Kỹ thuật & vận hành",
+      "path": "/kien-thuc/ky-thuat-van-hanh/",
+      "intro": "Chọn máy theo loại đá, quy trình khai thác và sản xuất đá xây dựng, vận hành an toàn và tối ưu năng suất máy nghiền.",
+      "order": 1,
+      "products": [],
+      "capacity": false,
+      "flow": [],
+      "project_kw": []
+    },
+    {
+      "key": "kt-cat-vlxd",
+      "parent": "kien-thuc",
+      "name": "Cát nhân tạo & vật liệu xây dựng",
+      "path": "/kien-thuc/cat-nhan-tao-vat-lieu-xay-dung/",
+      "intro": "Cát nhân tạo là gì, tiêu chuẩn cát nghiền, so sánh cát nhân tạo và cát tự nhiên, ứng dụng trong bê tông, cầu đường và gạch không nung.",
+      "order": 2,
+      "products": [],
+      "capacity": false,
+      "flow": [],
+      "project_kw": []
+    },
+    {
+      "key": "kt-thi-truong",
+      "parent": "kien-thuc",
+      "name": "Thị trường & giá",
+      "path": "/kien-thuc/thi-truong-gia/",
+      "intro": "Giá đá, giá cát xây dựng, thị trường vật liệu theo từng tỉnh và nhu cầu vật liệu cho các dự án cao tốc, sân bay.",
+      "order": 3,
+      "products": [],
+      "capacity": false,
+      "flow": [],
+      "project_kw": []
+    }
+  ]
+}

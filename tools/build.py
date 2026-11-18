@@ -26,6 +26,7 @@ import pickle
 import posixpath
 import re
 import shutil
+import sys
 import unicodedata
 import urllib.parse
 from collections import Counter, defaultdict
@@ -100,6 +101,8 @@ MENU = [  # (key, label, landing page, data-nav used for the active state)
     ("kien-thuc", "Kiến thức", "/nhan-bao-gia/", "tin-tuc"),
 ]
 MENU_BY_KEY = {m[0]: m for m in MENU}
+# full group records (data/menu.json); groups not "builtin" were added in the CMS
+GROUPS_DATA = {m[0]: {"key": m[0], "label": m[1], "landing": m[2], "nav": m[3], "builtin": True} for m in MENU}
 
 SECTIONS = {
     # Thiết bị: product cards (by name, from /san-pham/) + articles
@@ -178,6 +181,8 @@ MOVED_SECTIONS = {
 }
 # Dịch vụ menu also has the hand-built service page
 SERVICE_LINKS = [("Lắp đặt & chuyển giao", "/dich-vu/")]
+# fixed links shown before a group's categories (menu dropdown, sidebar, pills)
+GROUP_LINKS = {"dich-vu": SERVICE_LINKS}
 LEGACY_CATEGORIES = {"video"}  # old WordPress categories still kept as they were
 
 
@@ -1124,8 +1129,7 @@ def sidebar(from_dir: str, current: str | None) -> str:
     group = SECTIONS[current]["parent"] if current in SECTIONS else current if current in MENU_BY_KEY else "kien-thuc"
     _, label, landing, _ = MENU_BY_KEY[group]
     kids = [(v["name"], v["path"], k) for k, v in section_children(group)]
-    if group == "dich-vu":
-        kids = [(n, pth, None) for n, pth in SERVICE_LINKS] + kids
+    kids = [(n, pth, None) for n, pth in GROUP_LINKS.get(group, [])] + kids
     cur = ' aria-current="page"'
     items = []
     for name, pth, k in kids:
@@ -1247,8 +1251,7 @@ def generate_llms_txt(routes, model):
         "",
     ]
 
-    group_names = {"thiet-bi": "Thiết bị", "giai-phap": "Giải pháp – dây chuyền",
-                   "du-an": "Dự án", "dich-vu": "Dịch vụ", "kien-thuc": "Kiến thức"}
+    group_names = {key: {"giai-phap": "Giải pháp – dây chuyền"}.get(key, label) for key, label, _, _ in MENU}
     products = [r for r in routes.values() if r["kind"] == "product"]
     if products:
         out += ["## Sản phẩm tiêu biểu", ""]
@@ -1278,10 +1281,18 @@ def generate_llms_txt(routes, model):
     print(f"llms.txt: {sum(len(v) for v in articles.values())} bài, {len(products)} sản phẩm")
 
 
-def main():
+def main(source: str = "data"):
+    """Build the site. source="data": from data/ (what the CMS edits) - the normal build,
+    also run by CI. source="scrape": the old pipeline from the WordPress scrape
+    (tools/data/raw.pkl), only used by tools/export_cms_data.py for the one-off export."""
     rows, kept = load_audit()
-    raw = pickle.load(open(ROOT / "tools" / "data" / "raw.pkl", "rb"))
-    model = build_model(raw, kept)
+    if source == "scrape":
+        raw = pickle.load(open(ROOT / "tools" / "data" / "raw.pkl", "rb"))
+        model = build_model(raw, kept)
+    else:
+        model = load_cms_model(kept)
+        write_menu()
+        sync_layout()
     # URLs the old site already 301-redirects (urls.html: "Xoá" + merge target)
     model["redirect_to"] = {}
     for url, status, kind, in_sitemap, rec, reason, merge in rows:
@@ -1338,7 +1349,12 @@ def main():
         for n in range(2, total + 1):
             add_route(page_url(base, n), "section-pagination", f"{sec['name']} – Trang {n}",
                       members=members, total=total, page=n, base=base, section=key, index=False)
-    add_route("/giai-phap/", "solutions", "Giải pháp", index=True)
+    if "giai-phap" in MENU_BY_KEY:
+        add_route("/giai-phap/", "solutions", "Giải pháp", index=True)
+    for gkey, g in GROUPS_DATA.items():  # groups added in the CMS get a generated landing page
+        if not g.get("builtin"):
+            kids = [p for k, _ in section_children(gkey) for p in section_pages[k][0]]
+            add_route(g["landing"], "group", g["label"], group=gkey, members=kids, index=True)
     SECTION_COUNTS.update({k: len(v[0]) for k, v in section_pages.items()})
 
     # --- blog archive ------------------------------------------------------
@@ -1441,7 +1457,11 @@ def main():
     # ------------------------------------------------------------------
     for key, (members, total) in section_pages.items():
         generate_section(key, members, total, model)
-    generate_solutions_landing(section_pages)
+    if "giai-phap" in MENU_BY_KEY:
+        generate_solutions_landing(section_pages)
+    for gkey, g in GROUPS_DATA.items():
+        if not g.get("builtin"):
+            generate_group_landing(gkey, section_pages)
 
     # ------------------------------------------------------------------
     # category archives (+ pagination)
@@ -1545,6 +1565,12 @@ def main():
     sitemap_urls = sorted(set(sitemap_urls), key=sort_key)
     today = datetime.now().strftime("%Y-%m-%d")
     old_lastmod = model["old_lastmod"]
+    # a page with no date of its own keeps the date it already had in the sitemap
+    # (not the build date: CI rebuilds on every CMS save)
+    prev_sitemap = {}
+    if (SITE / "sitemap.xml").exists():
+        for loc, lm in re.findall(r"<loc>([^<]+)</loc><lastmod>([^<]+)</lastmod>", (SITE / "sitemap.xml").read_text(encoding="utf-8")):
+            prev_sitemap[html.unescape(loc)[len(BASE):]] = lm
 
     def lastmod(p):
         """Real date of the last change: the old site's sitemap for pages it had,
@@ -1557,10 +1583,10 @@ def main():
         newest = max((m.get("modified") or "" for m in members), default="") if members else ""
         old = old_lastmod.get(unicodedata.normalize("NFC", p), "")
         if route["kind"] in ("tag", "category") or p in EXISTING:
-            return max(old, newest) or today
+            return max(old, newest) or prev_sitemap.get(p) or today
         if route["kind"] == "solutions":
             return max((x["modified"] for x in model["primary_posts"] if SECTIONS[x["section"]]["parent"] == "giai-phap"), default=today)
-        return newest or old or today
+        return newest or old or prev_sitemap.get(p) or today
 
     entries = []
     for p in sitemap_urls:
@@ -1573,7 +1599,11 @@ def main():
     # old pagination of re-scoped listings (e.g. /category/tu-van-ky-thuat/page/15/)
     gone_pages = {p: re.sub(r"page/\d+/$", "", p) for p in model["kept_paths"]
                   if p not in routes and re.search(r"/page/\d+/$", p) and re.sub(r"page/\d+/$", "", p) in routes}
-    gone_pages.update({p: d for p, d in MOVED_SECTIONS.items() if p not in routes and d in routes})
+    def live_target(dest, hops=0):  # follow chains (post -> deleted category -> deleted group)
+        if dest in routes or hops > 8:
+            return dest if dest in routes else None
+        return live_target(MOVED_SECTIONS[dest], hops + 1) if dest in MOVED_SECTIONS else None
+    gone_pages.update({p: live_target(d) for p, d in MOVED_SECTIONS.items() if p not in routes and live_target(d)})
     write_redirects(rows, routes, gone_pages)
     remove_stale_pages(routes)
     normalize_existing_heads()
@@ -1726,7 +1756,10 @@ def write_redirects(rows, routes, extra=None):
 def generate_article(path, post, model, by_section, routes):
     from_dir = page_dir(path)
     image_map = model["image_map"]
-    body_html = sanitize(post["node"], from_dir=from_dir, model=model, image_map=image_map, post=post)
+    if post.get("content_html") is not None:
+        body_html = cms_body(post["content_html"], from_dir)
+    else:
+        body_html = sanitize(post["node"], from_dir=from_dir, model=model, image_map=image_map, post=post)
     if not body_html:
         body_html = f"<p>{esc(post['description'] or post['title'])}</p><p>Nội dung chi tiết đang được cập nhật. Quý khách cần tư vấn cấu hình, vui lòng gọi <a href=\"tel:0912712772\">0912 712 772</a>.</p>"
     if "<img" not in body_html and post["thumb"]:
@@ -1745,7 +1778,7 @@ def generate_article(path, post, model, by_section, routes):
     tags_html = ""
     if post["tags_data"]:
         chips = " ".join(f'<a href="{esc(rel_url(from_dir, "/tag/" + t["slug"] + "/"))}">{esc(clean(t["name"]) or nice_tag(t["slug"]))}</a>'
-                         for t in post["tags_data"] if ("/tag/" + t["slug"] + "/") in model["kept_paths"])
+                         for t in post["tags_data"] if ("/tag/" + t["slug"] + "/") in routes)
         if chips:
             tags_html = f'<div class="article__tags"><span>Chủ đề:</span>{chips}</div>'
 
@@ -2058,8 +2091,7 @@ def section_crumbs(key: str, current: bool = False):
 def section_nav(parent: str, current: str | None, from_dir: str) -> str:
     """Pills linking the sections of one menu group."""
     links = [(v["name"], v["path"], k == current) for k, v in section_children(parent)]
-    if parent == "dich-vu":
-        links = [(n, pth, False) for n, pth in SERVICE_LINKS] + links
+    links = [(n, pth, False) for n, pth in GROUP_LINKS.get(parent, [])] + links
     if len(links) < 2:
         return ""
     cur = ' aria-current="page"'
@@ -2083,6 +2115,8 @@ def section_videos(members, limit=3) -> list:
     seen, out = set(), []
     for p in members:
         node = p.get("node")
+        if node is None and p.get("content_html"):
+            node = BeautifulSoup(p["content_html"], "lxml")
         if node is None:
             continue
         for fr in node.find_all("iframe"):
@@ -2375,7 +2409,7 @@ def remove_stale_pages(routes):
     dry = os.environ.get("STALE_DRY") == "1"
     for f in sorted(SITE.rglob("index.html"), reverse=True):
         parts = f.relative_to(SITE).parts
-        if parts[0] in ("assets",) or parts[0].startswith("."):
+        if parts[0] in KEEP_DIRS or parts[0].startswith("."):
             continue
         rel = unicodedata.normalize("NFC", f.relative_to(SITE).as_posix())
         if rel not in live:
@@ -2476,6 +2510,175 @@ def generate_featured(model, image_map):
         write_page(path, page_shell(path=path, title=f"{name} | Thế Giới Máy Nghiền Đá",
                                     description=f"Dự án {name} – Thanh Long JSC.",
                                     canonical=BASE + path, body=body, nav="du-an", noindex=True))
+
+
+# ---------------------------------------------------------------------------
+# CMS data (data/) -> site. data/ is written by the CMS (Google Apps Script,
+# GitHub Contents API); see GAS.md. Never edit generated pages by hand.
+# ---------------------------------------------------------------------------
+DATA = ROOT / "data"
+# top-level folders that are not generated pages (never deleted by remove_stale_pages)
+KEEP_DIRS = ("assets", "admin", "vendor")
+_ROOT_URL = re.compile(r'(\s(?:href|src))="(/(?!/)[^"]*)"')
+_IMG_TAG = re.compile(r"<img\b[^>]*>")
+
+
+def load_data(name: str):
+    return json.loads((DATA / name).read_text(encoding="utf-8"))
+
+
+def load_cms_config():
+    """Menu groups, categories and CMS redirects from data/ -> the module settings
+    every generator reads (MENU, SECTIONS, ...)."""
+    global MENU, MENU_BY_KEY, GROUPS_DATA, SECTIONS, SECTION_FLOWS, SECTION_PROJECT_KW
+    global SECTION_BY_PATH, GROUP_LINKS, SERVICE_LINKS, MOVED_SECTIONS
+    menu = load_data("menu.json")
+    groups = sorted(menu["groups"], key=lambda g: (g.get("order", 0), g["key"]))
+    MENU = [(g["key"], g["label"], g["landing"], g["nav"]) for g in groups]
+    MENU_BY_KEY = {m[0]: m for m in MENU}
+    GROUPS_DATA = {g["key"]: g for g in groups}
+    GROUP_LINKS = {g["key"]: [(x["name"], x["path"]) for x in g.get("links", [])] for g in groups if g.get("links")}
+    SERVICE_LINKS = GROUP_LINKS.get("dich-vu", [])
+    gorder = {g["key"]: i for i, g in enumerate(groups)}
+    cats = sorted(menu["categories"], key=lambda c: (gorder.get(c["parent"], 999), c.get("order", 0), c["name"]))
+    SECTIONS, SECTION_FLOWS, SECTION_PROJECT_KW = {}, {}, {}
+    seen_paths = {}
+    for c in cats:
+        if c["parent"] not in gorder:
+            raise SystemExit(f"data/menu.json: danh mục '{c['key']}' thuộc nhóm '{c['parent']}' không tồn tại")
+        if c["path"] in seen_paths:
+            raise SystemExit(f"data/menu.json: '{c['key']}' trùng URL {c['path']} với '{seen_paths[c['path']]}'")
+        seen_paths[c["path"]] = c["key"]
+        SECTIONS[c["key"]] = {"parent": c["parent"], "name": c["name"], "path": c["path"],
+                              "intro": c.get("intro", ""), "products": c.get("products", []),
+                              "capacity": bool(c.get("capacity"))}
+        if c.get("flow"):
+            SECTION_FLOWS[c["key"]] = [tuple(x) for x in c["flow"]]
+        if c.get("project_kw"):
+            SECTION_PROJECT_KW[c["key"]] = list(c["project_kw"])
+    SECTION_BY_PATH = {v["path"]: k for k, v in SECTIONS.items()}
+    MOVED_SECTIONS = load_data("redirects.json") if (DATA / "redirects.json").exists() else {}
+
+
+def load_cms_model(kept):
+    """Same shape as build_model(), from data/posts*.json instead of the scrape."""
+    load_cms_config()
+    tag_names = load_data("tags.json")
+    fallback = "kt-ky-thuat" if "kt-ky-thuat" in SECTIONS else next(iter(SECTIONS))
+    posts = {}
+    for i, meta in enumerate(load_data("posts.json")):
+        d = load_data(f"posts/{meta['slug']}.json")
+        path = "/" + d["slug"] + "/"
+        dt = parse_date(d["date"])
+        section = d.get("section")
+        if section not in SECTIONS:
+            print(f"bài {path}: danh mục '{section}' không còn, tạm xếp vào {fallback}")
+            section = fallback
+        for t in d.get("tags", []):
+            tag_names.setdefault(t, nice_tag(t))
+        posts[path] = {
+            "path": path, "title": d["title"], "description": d.get("description", ""),
+            "dt": dt, "date_txt": fmt_date(dt), "modified": d.get("modified") or (dt.isoformat() if dt else ""),
+            "section": section, "thumb": d.get("thumb", ""),
+            "tags_data": [{"slug": t, "name": tag_names.get(t, nice_tag(t))} for t in d.get("tags", [])],
+            "categories_data": [{"slug": c} for c in d.get("legacy_categories", [])],
+            "primary_cat": "tin-tuc", "is_primary": True, "primary_path": path, "is_article": bool(dt),
+            "content_html": d.get("content_html", ""), "node": None, "order": i,
+        }
+    primary = sorted([p for p in posts.values() if p["is_article"]], key=lambda p: (-p["dt"].timestamp(), p["order"]))
+    kept_paths = {k["path"] for k in kept} | {v["path"] for v in SECTIONS.values()} | {"/giai-phap/"}
+    kept_paths |= {f"/tag/{t}/" for t in tag_names}
+    kept_paths |= set(posts)  # every article in data/ is published
+    return {
+        "image_map": {}, "kept_tags": {t: None for t in tag_names}, "kept_paths": kept_paths,
+        "posts": posts, "primary_posts": primary, "products": [], "catalog": load_catalog(),
+        "featured": [], "tag_names": tag_names, "old_lastmod": load_old_lastmod(),
+    }
+
+
+def cms_body(content: str, from_dir: str) -> str:
+    """Article HTML as stored by the CMS -> page HTML: root-absolute links/images become
+    relative to the page, images get width/height (no layout shift) and lazy loading."""
+    def img(m):
+        tag = m.group(0)
+        src = re.search(r'\ssrc="(/(?!/)[^"]*)"', tag)
+        if src and " width=" not in tag:
+            size = image_size(urllib.parse.unquote(src.group(1).lstrip("/").split("?")[0]))
+            if size:
+                tag = tag[:-1].rstrip("/").rstrip() + f' width="{size[0]}" height="{size[1]}">'
+        if " loading=" not in tag:
+            tag = tag[:-1].rstrip("/").rstrip() + ' loading="lazy" decoding="async">'
+        return tag
+    content = _IMG_TAG.sub(img, content or "")
+
+    def rel(m):
+        url = m.group(2)
+        path, rest = re.match(r"([^?#]*)(.*)", url).groups()
+        return f'{m.group(1)}="{rel_url(from_dir, path)}{rest}"'
+    return _ROOT_URL.sub(rel, content).strip()
+
+
+def write_menu():
+    """Main menu (desktop + mobile) and footer "Menu" column in index.html, from MENU /
+    SECTIONS / GROUP_LINKS. tools/menu.py does the same from the command line."""
+    import menu as menu_mod
+    menu_mod.build = sys.modules[__name__]
+    menu_mod.main()
+
+
+def sync_layout():
+    """Copy index.html's header/footer to every other page (tools/sync-layout.py)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("sync_layout", ROOT / "tools" / "sync-layout.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.main(quiet=True)
+
+
+def generate_group_landing(gkey, section_pages):
+    """Landing page of a menu group added in the CMS: its categories as boxes."""
+    g = GROUPS_DATA[gkey]
+    path = g["landing"]
+    from_dir = page_dir(path)
+    boxes = []
+    for key, sec in section_children(gkey):
+        count = len(section_pages[key][0])
+        boxes.append(f"""<a class="line-box reveal" href="{esc(rel_url(from_dir, sec['path']))}">
+            <h3>{esc(sec['name'])}</h3>
+            <p>{esc(sec['intro'])}</p>
+            <span class="line-box__more">Xem · {count} bài viết<svg class="ico ico--sm"><use href="#i-right"/></svg></span>
+          </a>""")
+    for name, pth in GROUP_LINKS.get(gkey, []):
+        boxes.insert(0, f"""<a class="line-box reveal" href="{esc(rel_url(from_dir, pth))}">
+            <h3>{esc(name)}</h3>
+            <span class="line-box__more">Xem<svg class="ico ico--sm"><use href="#i-right"/></svg></span>
+          </a>""")
+    intro = g.get("intro") or f"{g['label']} – Thanh Long JSC."
+    cr = [("Trang chủ", "/"), (g["label"], None)]
+    body = f"""    <div class="page-title">
+      <div class="container">
+        <h1>{esc(g['label'])}</h1>
+        {crumbs(cr, from_dir)}
+      </div>
+    </div>
+    <section class="section">
+      <div class="container">
+        <div class="intro-note reveal"><svg class="ico" aria-hidden="true"><use href="#i-info"/></svg><p>{esc(intro)}</p></div>
+        <div class="lines lines--page">
+          {"".join(boxes) or '<p class="list-empty">Chưa có danh mục.</p>'}
+        </div>
+      </div>
+    </section>
+{cta_band(from_dir)}"""
+    jsonld = [
+        {"@context": "https://schema.org", "@type": "BreadcrumbList",
+         "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Trang chủ", "item": BASE + "/"},
+                             {"@type": "ListItem", "position": 2, "name": g["label"], "item": BASE + path}]},
+        {"@context": "https://schema.org", "@type": "CollectionPage", "name": g["label"],
+         "url": BASE + path, "description": intro},
+    ]
+    write_page(path, page_shell(path=path, title=g["label"] + TITLE_SUFFIX, description=intro,
+                                canonical=BASE + path, body=body, nav=g["nav"], jsonld=jsonld))
 
 
 if __name__ == "__main__":

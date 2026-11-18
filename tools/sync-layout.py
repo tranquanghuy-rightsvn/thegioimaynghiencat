@@ -39,7 +39,10 @@ def rebase(snippet, depth):
     return URL_ATTR.sub(fix, snippet)
 
 
-def main():
+SKIP_DIRS = {"admin", "vendor", "assets"}  # not site pages (no header/footer markers)
+
+
+def main(quiet=False):
     source = (ROOT / "index.html").read_text(encoding="utf-8")
     parts = {name: block(source, name).group(0) for name in BLOCKS}
     pages = sorted(
@@ -47,6 +50,7 @@ def main():
         if p != ROOT / "index.html"
         and not any(s.startswith(".") for s in p.relative_to(ROOT).parts)
         and "tools" not in p.parts
+        and p.relative_to(ROOT).parts[0] not in SKIP_DIRS
     )
     for page in pages:
         depth = len(page.relative_to(ROOT).parts) - 1
@@ -55,7 +59,10 @@ def main():
             m = block(html, name)
             html = html[:m.start()] + rebase(parts[name], depth) + html[m.end():]
         page.write_text(html, encoding="utf-8")
-        print(f"đã đồng bộ {page.relative_to(ROOT)} (độ sâu {depth})")
+        if not quiet:
+            print(f"đã đồng bộ {page.relative_to(ROOT)} (độ sâu {depth})")
+    if quiet:
+        print(f"sync-layout: {len(pages)} trang")
 
 
 if __name__ == "__main__":

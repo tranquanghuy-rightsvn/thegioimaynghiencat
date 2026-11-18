@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in */gas/*.html) node \"$CLAUDE_PROJECT_DIR/scripts/check_gas_client.mjs\" >&2 || exit 2;; esac; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}

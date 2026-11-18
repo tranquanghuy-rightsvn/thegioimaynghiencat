@@ -7,3 +7,4 @@ tools/cache/
 tools/data/raw.pkl
 tools/data/gsc/
 __pycache__/
+gas/
