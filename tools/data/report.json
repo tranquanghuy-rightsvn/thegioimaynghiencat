@@ -1,9 +1,10 @@
 {
   "kept": 1061,
-  "generated_routes": 1110,
+  "generated_routes": 1111,
   "missing_kept": [],
   "redirected_pagination": 2,
   "extra_generated": [
+    "/kinh-nghiem-dau-tu-tram-nghien-da-650-tph-tai-thanh-hoa/",
     "/nhan-bao-gia/page/26/",
     "/nhan-bao-gia/page/27/",
     "/tag/bao-gia-may-nghien-cat/page/6/",
@@ -18,6 +19,6 @@
     "/tag/may-nghien-da-xay-dung/page/4/",
     "/tag/may-vo-da/page/3/"
   ],
-  "primary_posts": 242,
+  "primary_posts": 243,
   "tags": 708
 }
