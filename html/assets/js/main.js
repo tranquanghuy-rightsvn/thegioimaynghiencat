@@ -212,10 +212,36 @@
     pickOption(qCap, params.get('cap'));
   }
 
-  /* ---------- form báo giá / liên hệ: kiểm tra rồi mở ứng dụng email (không dùng action="mailto:") ---------- */
-  $$('form[data-mailto]').forEach(function (form) {
+  /* ---------- form báo giá / liên hệ: kiểm tra rồi gửi về hệ thống quản trị ----------
+     Lưu vào mục "Liên hệ & báo giá" trong trang quản trị + email báo cho người phụ trách.
+     Content-Type text/plain để trình duyệt không gửi yêu cầu OPTIONS (máy chủ form không nhận). */
+  var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycby7QaU0nhO_B4xc99lwE_wxYOoKiQp0BXu5caJreWKphm2MPllH_hz2yRFNHBSOfCE/exec';
+  var MAIN_FIELDS = { name: 1, phone: 1, email: 1, message: 1, note: 1, subject: 1, _hp: 1 };
+  function fieldLabel(el, form) {
+    var lb = el.id && $('label[for="' + el.id + '"]', form);
+    if (!lb) {
+      var grp = el.closest('[aria-labelledby]');
+      lb = grp && document.getElementById(grp.getAttribute('aria-labelledby'));
+    }
+    return lb ? lb.textContent.replace('*', '').replace(/\s+/g, ' ').trim() : el.name;
+  }
+  function formStatus(form, ok, text) {
+    var box = $('.form-status', form);
+    if (!box) {
+      box = document.createElement('p');
+      box.setAttribute('role', 'status');
+      box.tabIndex = -1;
+      form.appendChild(box);
+    }
+    box.className = 'form-status ' + (ok ? 'form-done' : 'form-fail');
+    box.textContent = text;
+    box.focus();
+  }
+  $$('form[data-form]').forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+      var btn = $('button[type="submit"]', form);
+      if (btn && btn.disabled) return;
       var firstBad = null;
       $$('input, select, textarea', form).forEach(function (el) {
         var box = el.closest('.field');
@@ -225,17 +251,36 @@
         if (bad && !firstBad) firstBad = el;
       });
       if (firstBad) { firstBad.focus(); return; }
-      var subject = '', lines = [];
+      var data = { formType: form.getAttribute('data-form'), page: location.pathname }, extra = {}, order = [];
       $$('input, select, textarea', form).forEach(function (el) {
-        if (!el.name || !el.value) return;
-        if (el.name === 'subject') { subject = el.value; return; }
-        var lb = el.id && $('label[for="' + el.id + '"]', form);
-        var name = lb ? lb.textContent.replace('*', '').trim() : el.name;
-        lines.push(name + ': ' + el.value);
+        if (!el.name || (el.type === 'checkbox' && !el.checked)) return;
+        var v = String(el.value || '').trim();
+        if (MAIN_FIELDS[el.name]) {
+          if (el.name === 'note') data.message = v;
+          else if (el.name !== 'subject') data[el.name] = v;
+          return;
+        }
+        if (!v) return;
+        if (!extra[el.name]) { extra[el.name] = { label: fieldLabel(el, form), vals: [] }; order.push(el.name); }
+        extra[el.name].vals.push(v);
       });
-      window.location.href = 'mailto:' + form.getAttribute('data-mailto') +
-        '?subject=' + encodeURIComponent(subject || document.title) +
-        '&body=' + encodeURIComponent(lines.join('\n'));
+      data.details = order.map(function (k) { return extra[k].label + ': ' + extra[k].vals.join(', '); }).join('\n');
+      var label = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.classList.add('is-loading'); btn.textContent = 'Đang gửi...'; }
+      fetch(FORM_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (!res || !res.ok) throw new Error((res && res.error) || '');
+          form.reset();
+          formStatus(form, true, 'Đã gửi thành công! Kỹ sư Thanh Long sẽ liên hệ lại với bạn sớm nhất.');
+        })
+        .catch(function (err) {
+          formStatus(form, false, (err && err.message ? err.message + ' ' : 'Chưa gửi được. ') +
+            'Bạn có thể gọi hotline 0912 712 772 hoặc thử gửi lại.');
+        })
+        .then(function () {
+          if (btn) { btn.disabled = false; btn.classList.remove('is-loading'); btn.textContent = label; }
+        });
     });
   });
 

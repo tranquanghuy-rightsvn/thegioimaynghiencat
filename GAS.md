@@ -17,6 +17,7 @@ Phạm vi CMS (đúng yêu cầu: "quản lý đầy đủ các mục trên menu
 2. **Danh mục** — các mục con trong từng nhóm menu (trang danh mục /san-pham/may-nghien-da/…).
 3. **Bài viết** — toàn bộ 242 bài cũ (đã chuyển sang data/) + bài mới.
 4. **Người dùng** — ai được đăng nhập CMS.
+4b. **Liên hệ & báo giá** — khách gửi form trên site (mục XII), admin xem/đổi trạng thái/xoá.
 5. **Công cụ SEO** cho cả Bài viết lẫn Danh mục (mục XI): Viết bằng AI, Smart content, chấm điểm SEO kiểu
    Rank Math + ô Từ khoá chính / Từ khoá phụ / Tiêu đề SEO.
 
@@ -32,7 +33,7 @@ menu "Giới thiệu", "Liên hệ", "Báo giá" (nằm trong `tools/menu.py`).
 3. 3 cấp `root > admin > editor`:
    - `editor`: Bài viết (thêm/sửa/xoá, tải ảnh).
    - `admin`: mọi thứ của editor + Menu + Danh mục + Người dùng (vì menu/danh mục đổi cấu
-     trúc toàn site, đổi URL).
+     trúc toàn site, đổi URL) + Liên hệ & báo giá (thông tin khách hàng — editor không xem).
    - `root`: chủ script. Không cấp được qua CMS.
    Qua CMS chỉ thêm/sửa/xoá được `admin`, `editor`; không tự sửa/xoá chính mình.
 4. OTP sống 10 phút, cooldown 60 giây/email, sai 5 lần phải xin mã mới. Token sống 30 ngày,
@@ -128,7 +129,9 @@ menu "Giới thiệu", "Liên hệ", "Báo giá" (nằm trong `tools/menu.py`).
 
 ## VIII. Lưu trữ (tên file/cột CỐ ĐỊNH — đổi phải sửa cả Code.js lẫn tools/build.py)
 
-Google Sheet "Thegioimaynghienda CMS Data" (tự tạo lần đầu): sheet `Users` (`email`, `role`).
+Google Sheet "Thegioimaynghienda CMS Data" (tự tạo lần đầu): sheet `Users` (`email`, `role`); sheet
+`Contacts` (`id, created_at, form, name, phone, email, message, details, page, status` — tự tạo khi có liên
+hệ đầu tiên, cột mới luôn thêm ở cuối; KHÔNG bao giờ đẩy lên GitHub).
 
 GitHub (repo site):
 
@@ -171,6 +174,7 @@ WordPress sang `data/`; từ nay `data/` là nguồn chân lý, không chạy l�
 - `GITHUB_REPO` = `thegioimaynghiencat`
 - `GITHUB_BRANCH` = `master`
 - `SPREADSHEET_ID` — không cần điền, tự tạo lần đầu.
+- `NOTIFY_EMAIL` — tuỳ chọn: người nhận mail báo liên hệ. Trống = `hieu@labcare.com.vn` (`NOTIFY_EMAIL_DEFAULT`).
 - `GEMINI_API_KEY`, `GEMINI_MODEL` — KHÔNG điền tay: admin nhập ở Hệ thống → AI (Gemini) (gọi thử rồi mới
   lưu, chỉ hiện bản che; model trống = tự chọn bản Pro mới nhất key dùng được). `AI_USAGE` — số token đã dùng
   theo tháng (code tự ghi, chỉ để theo dõi — Google tính tiền thẳng vào tài khoản Google của chủ key).
@@ -207,3 +211,22 @@ viết LẪN form Danh mục (kind `post` | `category`). Trang đích nhóm (là
    (hoặc bản Smart content của nó) hiện dưới danh sách bài ở trang 1 (`.sec-content`). Admin nạp
    smart-scope.js / smart.css / smart.js / style.css từ https://thegioimaynghienda.com → sửa các file này phải
    đưa site lên trước.
+
+## XII. Liên hệ & báo giá (thêm 21/11/2026)
+
+1. 3 form trên site gửi về CMS: trang chủ "Nhận báo giá" + `/bao-gia/` (`data-form="quote"`), `/lien-he/`
+   (`data-form="contact"`). `html/assets/js/main.js` kiểm tra ô bắt buộc rồi `fetch` POST tới URL `/exec`
+   (Content-Type `text/plain` để né preflight CORS) → `doPost` → `handleContact_`. Trước đây form mở ứng dụng
+   email (mailto) — đã bỏ.
+2. Gửi lên: `name`, `phone` (bắt buộc, ≥ 9 số), `email`, `message` (ô Nội dung/Ghi chú), `details` (mọi ô
+   khác của form, dạng "Nhãn: giá trị" mỗi dòng — sản phẩm, vật liệu, công suất, đầu ra...), `page`. Thêm ô
+   mới vào form thì tự vào `details`, không phải sửa server.
+3. Chống spam: ô ẩn `_hp` (honeypot — có giá trị thì trả ok nhưng không lưu), 1 lần/20 giây/số điện thoại,
+   mỗi ô ≤ 4000 ký tự. Mọi chuỗi ghi Sheet kèm `'` đầu (giữ số 0 đầu SĐT, chặn công thức).
+4. Lưu sheet `Contacts` (trạng thái `Mới` → `Đang xử lý` → `Đã xử lý`), rồi gửi mail (MailApp) tới
+   `NOTIFY_EMAIL` hoặc `hieu@labcare.com.vn`, `replyTo` = email khách nếu có. Lỗi mail không làm hỏng việc
+   đã lưu. Quota 100 mail/ngày DÙNG CHUNG với mã OTP đăng nhập.
+5. Admin: thanh bên khu "Khách hàng" → "Liên hệ & báo giá" (chỉ admin/root, server `requireRole_(admin)`),
+   huy hiệu đỏ = số liên hệ `Mới` (`boot()` trả `newContacts`, chỉ đếm cho admin). Danh sách không nằm trong
+   `boot()`, tải khi mở tab, cache localStorage `tgmnd_cms_contacts_<build>`; lọc theo trạng thái; đổi trạng
+   thái / xoá (có xác nhận).

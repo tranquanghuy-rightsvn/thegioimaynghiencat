@@ -41,8 +41,8 @@ import smart as smart_mod  # tools/smart.py - Smart content rendering
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "html"  # deployable website (Cloudflare serves this folder)
 BASE = "https://thegioimaynghienda.com"
-CSS_VER = "20261118a"
-JS_VER = "20261115b"
+CSS_VER = "20261121a"
+JS_VER = "20261121a"
 PER_PAGE = 9  # 3 full rows of 3 on desktop; a leftover card on 2-column screens goes wide
 
 EXISTING = {

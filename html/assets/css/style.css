@@ -484,6 +484,7 @@ body.is-locked { overflow: hidden; }
 .field.is-err .field__err { display: block; }
 .js-form .button.is-loading { pointer-events: none; opacity: .7; }
 .form-done { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 14px; background: #e9f8ea; border: 1px solid #b6e5b9; color: #276b2b; font-size: 14.5px; outline: none; animation: fadeDown .3s ease; }
+.form-fail { margin-top: 14px; padding: 14px; background: #fdecec; border: 1px solid #f3b8b8; color: #a1151f; font-size: 14.5px; outline: none; }
 .form-done .ico { fill: var(--green); width: 24px; height: 24px; }
 
 /* ---------- footer ---------- */
