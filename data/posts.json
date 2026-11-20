@@ -641,16 +641,17 @@
   {
     "slug": "may-nghien-phan-kich",
     "title": "Máy nghiền phản kích",
-    "description": "Bài viết cung cấp thông tin chi tiết về dòng máy nghiền phản kích, được thiết kế để xử lý các loại đá cứng, quặng và vật liệu xây dựng.",
+    "description": "Bài viết cung cấp thông tin chi tiết về dòng máy nghiền phản kích, cấu tạo, nguyên lý hoạt động, ưu nhược điểm và ứng dụng trong các ngành công nghiệp.",
     "section": "tb-nghien-da",
     "date": "2024-01-24T04:18:02+00:00",
-    "modified": "2024-12-03T06:37:09+00:00",
-    "thumb": "assets/img/content/4ced13566aef17.webp",
+    "modified": "2026-11-20T09:19:35+00:00",
+    "thumb": "assets/img/cms/may-nghien-phan-kich/cover-1795166237257.jpg",
     "tags": [
       "may-nghien-phan-kich",
       "may-nghien-phan-kich-di-dong"
     ],
-    "legacy_categories": []
+    "legacy_categories": [],
+    "smart": true
   },
   {
     "slug": "may-nghien-bua-thiet-bi-dung-trong-day-chuyen-nghien-da",
