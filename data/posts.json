@@ -73,13 +73,14 @@
   {
     "slug": "giai-phap-tai-che-vat-lieu-hieu-qua-tiet-kiem-chi-phi",
     "title": "Giải Pháp Tái Chế Vật Liệu Hiệu Quả, Tiết Kiệm Chi Phí",
-    "description": "Trong ngành xây dựng hiện đại, việc tái chế vật liệu đang trở thành xu hướng tất yếu nhằm giảm chi phí, bảo vệ môi trường và nâng cao hiệu quả sản xuất. Một trong những thiết bị quan trọng giúp xử lý phế liệu công nghiệp là máy nghiền sỉ thép – giải pháp tối ưu để tái chế sỉ lò thép thành vật liệu xây dựng chất lượng cao.",
+    "description": "Khám phá giải pháp tái chế vật liệu xây dựng hiệu quả với máy nghiền sỉ thép chất lượng cao, giúp tiết kiệm chi phí và bảo vệ môi trường tối ưu.",
     "section": "gp-tai-che",
     "date": "2026-03-03T07:27:58+00:00",
-    "modified": "2026-03-03T07:27:59+00:00",
+    "modified": "2026-11-23T08:28:54+00:00",
     "thumb": "assets/img/content/fddb146f790d24.webp",
     "tags": [],
-    "legacy_categories": []
+    "legacy_categories": [],
+    "smart": true
   },
   {
     "slug": "day-chuyen-nghien-da-cat-ket-giai-phap-san-xuat-cat-xay-dung-hieu-qua-va-ben-vung",
