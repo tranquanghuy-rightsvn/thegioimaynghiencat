@@ -903,7 +903,7 @@ body.is-locked { overflow: hidden; }
 .with-side > .article-wrap .article__meta { justify-content: flex-start; }
 .with-side > .article-wrap .article__body img { max-width: 100%; height: auto; }
 .with-side > .article-wrap .article__body iframe { max-width: 100%; }
-.with-side > .article-wrap .article__body table { display: block; max-width: 100%; overflow-x: auto; }
+.with-side > .article-wrap .article__body table:not(.smc-root table) { display: block; max-width: 100%; overflow-x: auto; }
 /* section pages: company videos */
 .vids { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 10px; }
 .vid { margin: 0; background: var(--white); box-shadow: var(--shadow-1); }
