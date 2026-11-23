@@ -2376,8 +2376,11 @@ def defer_home_images():
 
 
 def link_catalog_cards():
-    """Home page and /san-pham/: a machine's image and name open its group page
-    (they used to jump to the quote form). The quote buttons are left as they are."""
+    """Home page and /san-pham/: a machine's image and name open the machine's own article
+    (the "Tìm hiểu" link of its card on /san-pham/); a machine without an article opens its
+    group page. The quote buttons are left as they are."""
+    articles = {p["name"]: p["learn"] for p in load_catalog()
+                if p["learn"] not in ("/san-pham/", "/lien-he/") and not p["learn"].startswith(("/san-pham/", "/giai-phap/"))}
     for path, rel in (("/", "index.html"), ("/san-pham/", "san-pham/index.html")):
         f = SITE / rel
         h = f.read_text(encoding="utf-8")
@@ -2389,7 +2392,7 @@ def link_catalog_cards():
             if not t:
                 return card
             name = html.unescape(re.sub(r"<[^>]+>", "", t.group(2))).strip()
-            target = machine_page(name)
+            target = articles.get(name) or machine_page(name)
             if not target:
                 return card
             href = esc(rel_url(from_dir, target))
